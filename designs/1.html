@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DailyFood – עמוד ראשי (עברית)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: "#2E7D32",
+                light: "#4CAF50",
+                dark: "#1B5E20",
+              },
+              accent: {
+                DEFAULT: "#FFB74D",
+                dark: "#F57C00",
+              },
+            },
+            boxShadow: {
+              soft: "0 10px 25px rgba(15,23,42,0.06)",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-slate-50 min-h-screen text-slate-900">
+    <!-- כותרת עליונה -->
+    <header
+      class="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-slate-200"
+    >
+      <div
+        class="max-w-6xl mx-auto flex flex-col gap-3 md:flex-row md:items-center md:justify-between px-4 py-3"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="h-10 w-10 rounded-2xl bg-primary flex items-center justify-center text-white font-bold text-lg shadow-soft"
+          >
+            D
+          </div>
+          <div>
+            <div class="font-bold text-slate-900 text-lg">DailyFood</div>
+            <div class="text-xs text-slate-500">
+              מערכת לתרומות מזון – עיצוב עמוד ראשי (עברית)
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 items-center">
+          <div
+            class="flex items-center gap-1 text-xs border border-slate-200 rounded-full px-2 py-1 bg-slate-50"
+          >
+            <span class="font-medium text-slate-600">שפה:</span>
+            <span class="px-2 py-0.5 rounded-full text-slate-500">EN</span>
+            <span class="px-2 py-0.5 rounded-full bg-primary text-white">
+              עברית
+            </span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-6 space-y-3">
+      <p class="text-xs text-slate-500">
+        זהו עיצוב משופר של העמוד הראשי בגרסת
+        <strong>עברית</strong>
+        עם כיוון כתיבה
+        <strong>RTL</strong>.
+      </p>
+
+      <!-- עיצוב 1 משופר – עברית -->
+      <section id="design-1">
+        <!-- HERO -->
+        <section
+          class="relative overflow-hidden rounded-3xl shadow-soft bg-gradient-to-br from-primary-dark via-primary to-emerald-500 text-white px-6 py-8 md:px-10 md:py-10 mb-6"
+        >
+          <!-- צורה דקורטיבית -->
+          <div
+            class="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-white/10 blur-3xl"
+          ></div>
+
+          <div class="relative flex flex-col md:flex-row gap-8 md:gap-10">
+            <!-- צד ימין: טקסט (כי RTL) -->
+            <div class="md:w-1/2 space-y-4">
+              <p class="text-xs uppercase tracking-[0.2em] text-emerald-100">
+                עיצוב 1 משופר · אזור ראשי + פעולות לפי תפקיד
+              </p>
+              <h1 class="text-3xl md:text-4xl font-bold leading-tight">
+                הפכו עודפי מזון לעזרה אמיתית — בכל יום.
+              </h1>
+              <p class="text-sm md:text-base text-emerald-50/90 max-w-xl">
+                עסקים תורמים את המזון שנשאר בסוף היום, מתנדבים אוספים ומסיעים,
+                ומשפחות מקבלות סיוע דיסקרטי. הכול מנוהל במערכת אחת, בזמן אמת.
+              </p>
+
+              <div class="flex flex-wrap gap-3 pt-2">
+                <button
+                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white text-primary text-sm font-semibold shadow-md hover:bg-emerald-50 transition"
+                >
+                  אני רוצה לתרום
+                  <span
+                    class="text-xs bg-emerald-100 text-primary rounded-full px-2 py-0.5"
+                  >
+                    עסק / תורם פרטי
+                  </span>
+                </button>
+                <button
+                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-black/10 text-white text-sm font-semibold border border-white/20 hover:bg-black/20 transition"
+                >
+                  אני צריך/ה עזרה
+                </button>
+                <button
+                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-black/5 text-white text-xs border border-white/15 hover:bg-black/15 transition"
+                >
+                  אני מתנדב/ת
+                </button>
+              </div>
+
+              <!-- מיני-סטטיסטיקות -->
+              <div
+                class="flex flex-wrap gap-4 pt-4 border-t border-emerald-200/30 mt-4"
+              >
+                <div>
+                  <p class="text-xs text-emerald-100">ארוחות שנשמרו היום</p>
+                  <p class="text-lg font-semibold">128</p>
+                </div>
+                <div>
+                  <p class="text-xs text-emerald-100">תרומות פעילות</p>
+                  <p class="text-lg font-semibold">23</p>
+                </div>
+                <div>
+                  <p class="text-xs text-emerald-100">נהגים זמינים לידך</p>
+                  <p class="text-lg font-semibold">9</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- צד שמאל: כרטיסים -->
+            <div
+              class="md:w-1/2 flex flex-col gap-4 md:items-start md:justify-center"
+            >
+              <div
+                class="w-full md:max-w-sm bg-white/95 text-slate-900 rounded-2xl shadow-soft border border-emerald-50 p-4 space-y-3"
+              >
+                <div class="flex items-center justify-between">
+                  <h2 class="text-sm font-semibold text-slate-900">
+                    פעיל עכשיו באזור שלך
+                  </h2>
+                  <span
+                    class="text-[10px] px-2 py-1 rounded-full bg-emerald-100 text-emerald-800"
+                  >
+                    בזמן אמת
+                  </span>
+                </div>
+
+                <div class="space-y-2 text-xs">
+                  <div
+                    class="flex justify-between items-center rounded-lg border border-slate-200 px-3 py-2"
+                  >
+                    <div>
+                      <p class="font-medium text-slate-900">מאפיית פלורנטין</p>
+                      <p class="text-[11px] text-slate-500">
+                        18 כריכים • 0.8 ק"מ • איסוף עד 21:00
+                      </p>
+                    </div>
+                    <span
+                      class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px]"
+                    >
+                      זמין
+                    </span>
+                  </div>
+                  <div
+                    class="flex justify-between items-center rounded-lg border border-slate-200 px-3 py-2"
+                  >
+                    <div>
+                      <p class="font-medium text-slate-900">ארגז ירקות טריים</p>
+                      <p class="text-[11px] text-slate-500">
+                        דוכן שוק • 1.6 ק"מ • ל־3 משפחות
+                      </p>
+                    </div>
+                    <span
+                      class="px-2 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px]"
+                    >
+                      שמור
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  class="w-full mt-2 px-3 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary-dark transition"
+                >
+                  הצג את כל התרומות הקרובות
+                </button>
+              </div>
+
+              <!-- כרטיס מיני-מפה -->
+              <div
+                class="w-full md:max-w-xs rounded-2xl border border-emerald-50 bg-primary-dark/40 backdrop-blur text-emerald-50 px-4 py-3 flex gap-3 items-center"
+              >
+                <div
+                  class="h-12 w-12 rounded-xl bg-black/10 flex items-center justify-center text-xs"
+                >
+                  מפה
+                </div>
+                <div class="text-xs">
+                  <p class="font-semibold">מסלולים חכמים</p>
+                  <p class="text-emerald-100/90">
+                    אנחנו מאחדים מספר תרומות לאיסוף אחד, כדי לחסוך זמן ונסיעות
+                    לנהגים.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- "איך זה עובד" + כרטיסים -->
+        <section class="space-y-6">
+          <!-- איך זה עובד -->
+          <div class="flex flex-col md:flex-row gap-6">
+            <div class="md:w-1/3">
+              <h2 class="text-lg font-semibold mb-2">איך זה עובד?</h2>
+              <p class="text-sm text-slate-600">
+                בכמה צעדים פשוטים המזון עובר מעסקים למשפחות, בעזרת מתנדבים.
+              </p>
+            </div>
+            <div class="md:w-2/3 grid md:grid-cols-3 gap-4">
+              <div class="bg-white rounded-2xl shadow-soft p-4 space-y-2">
+                <div
+                  class="h-8 w-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold"
+                >
+                  1
+                </div>
+                <h3 class="text-sm font-semibold">מפרסמים תרומה</h3>
+                <p class="text-xs text-slate-600">
+                  עסקים או תורמים פרטיים מוסיפים תרומת מזון או ציוד, עם שעת
+                  איסוף.
+                </p>
+              </div>
+              <div class="bg-white rounded-2xl shadow-soft p-4 space-y-2">
+                <div
+                  class="h-8 w-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold"
+                >
+                  2
+                </div>
+                <h3 class="text-sm font-semibold">מתאימים מבקשים ונהגים</h3>
+                <p class="text-xs text-slate-600">
+                  משפחות מבקשות עזרה, והמערכת מציעה מסלולים לנהגים באזור.
+                </p>
+              </div>
+              <div class="bg-white rounded-2xl shadow-soft p-4 space-y-2">
+                <div
+                  class="h-8 w-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold"
+                >
+                  3
+                </div>
+                <h3 class="text-sm font-semibold">עוקבים אחרי ההשפעה</h3>
+                <p class="text-xs text-slate-600">
+                  מנהלי המערכת רואים כמה ארוחות חולקו, כמה מסלולים הושלמו ומה
+                  זמן התגובה.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- פרסונות + כרטיס סטטיסטיקות -->
+          <div class="grid md:grid-cols-[2fr,1fr] gap-6">
+            <div class="grid sm:grid-cols-3 gap-4">
+              <div class="bg-white rounded-2xl shadow-soft p-4 space-y-2">
+                <p
+                  class="inline-flex text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold uppercase tracking-wide"
+                >
+                  עסק
+                </p>
+                <h3 class="text-sm font-semibold">פרסום מהיר</h3>
+                <p class="text-xs text-slate-600">
+                  שמור תבניות לתרומות קבועות (כמו "לחם יומי") ופרסם בלחיצה אחת.
+                </p>
+              </div>
+              <div class="bg-white rounded-2xl shadow-soft p-4 space-y-2">
+                <p
+                  class="inline-flex text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-amber-800 font-semibold uppercase tracking-wide"
+                >
+                  מקבל/ת תרומה
+                </p>
+                <h3 class="text-sm font-semibold">בקשות דיסקרטיות</h3>
+                <p class="text-xs text-slate-600">
+                  הבקשות שלך נראות רק למנהלים ולתורמים/ות שהותאמו אליך.
+                </p>
+              </div>
+              <div class="bg-white rounded-2xl shadow-soft p-4 space-y-2">
+                <p
+                  class="inline-flex text-[10px] px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 font-semibold uppercase tracking-wide"
+                >
+                  מתנדב/ת
+                </p>
+                <h3 class="text-sm font-semibold">מסלולים חכמים</h3>
+                <p class="text-xs text-slate-600">
+                  מאחדים כמה נקודות איסוף והפצה למסלול אחד, עם התמצאות במפה.
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="bg-slate-900 text-slate-50 rounded-2xl shadow-soft p-4 space-y-3"
+            >
+              <p class="text-xs text-emerald-200">תמונת מצב להיום</p>
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs">
+                  <span>תרומות שהושלמו</span>
+                  <span class="font-semibold">34</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                  <span>זמן איסוף ממוצע</span>
+                  <span class="font-semibold">21 דקות</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                  <span>חיסכון מוערך בפסולת מזון</span>
+                  <span class="font-semibold">~ 42 ק"ג</span>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400">
+                במערכת האמיתית אפשר למשוך כאן נתונים חיים מ־MongoDB וליצור
+                גרף/מדד בזמן אמת.
+              </p>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

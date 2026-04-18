@@ -1,0 +1,574 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.Toastify__toast--error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  color: white !important;
+  font-weight: bold !important;
+}
+
+.Toastify__toast--success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.Toastify__toast--info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.Toastify__toast--warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+/* ========================================
+   PHONE INPUT STYLING
+   ======================================== */
+
+/* Main phone input container */
+.react-international-phone-input-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Phone input field */
+.react-international-phone-input {
+  font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+  transition: border-color 0.2s ease-in-out !important;
+}
+
+.react-international-phone-input:hover {
+  border-color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.react-international-phone-input:focus {
+  outline: none !important;
+  border-color: #359364 !important;
+  box-shadow: 0 0 0 1px #359364 !important;
+}
+
+/* Country selector button */
+.react-international-phone-country-selector-button {
+  background-color: transparent !important;
+  transition: background-color 0.2s ease-in-out !important;
+}
+
+.react-international-phone-country-selector-button:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Country selector dropdown */
+.react-international-phone-country-selector-dropdown {
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 8px !important;
+  z-index: 9999 !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.react-international-phone-country-selector-dropdown__list {
+  max-height: 250px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Dropdown search input */
+.react-international-phone-country-selector-dropdown__list-item--search input {
+  font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+  font-size: 14px !important;
+  padding: 10px 12px !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border-radius: 4px !important;
+  margin: 8px !important;
+  width: calc(100% - 16px) !important;
+}
+
+.react-international-phone-country-selector-dropdown__list-item--search
+  input:focus {
+  outline: none !important;
+  border-color: #359364 !important;
+  box-shadow: 0 0 0 1px #359364 !important;
+}
+
+/* Country list items */
+.react-international-phone-country-selector-dropdown__list-item {
+  padding: 10px 16px !important;
+  font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease-in-out !important;
+}
+
+.react-international-phone-country-selector-dropdown__list-item:hover {
+  background-color: rgba(53, 147, 100, 0.08) !important;
+}
+
+.react-international-phone-country-selector-dropdown__list-item--selected,
+.react-international-phone-country-selector-dropdown__list-item--focused {
+  background-color: rgba(53, 147, 100, 0.12) !important;
+  font-weight: 500 !important;
+}
+
+/* Country flag */
+.react-international-phone-flag-emoji {
+  font-size: 20px !important;
+}
+
+/* Dial code in dropdown */
+.react-international-phone-country-selector-dropdown__list-item__dial-code {
+  color: rgba(0, 0, 0, 0.6) !important;
+  font-size: 13px !important;
+}
+
+/* Error state */
+.phone-input-error .react-international-phone-input {
+  border-color: #d32f2f !important;
+}
+
+.phone-input-error .react-international-phone-input:focus {
+  border-color: #d32f2f !important;
+  box-shadow: 0 0 0 1px #d32f2f !important;
+}
+
+.phone-input-error .react-international-phone-country-selector-button {
+  border-right-color: #d32f2f !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Fix autocomplete background to cover full width including icon areas */
+.MuiInputBase-root input:-webkit-autofill,
+.MuiInputBase-root input:-webkit-autofill:hover,
+.MuiInputBase-root input:-webkit-autofill:focus,
+.MuiInputBase-root input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: inherit !important;
+  border-radius: inherit;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Ensure autofill works in both LTR and RTL */
+[dir="rtl"] .MuiInputBase-root input:-webkit-autofill,
+[dir="rtl"] .MuiInputBase-root input:-webkit-autofill:hover,
+[dir="rtl"] .MuiInputBase-root input:-webkit-autofill:focus,
+[dir="rtl"] .MuiInputBase-root input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  box-shadow: 0 0 0 1000px white inset !important;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* RTL Support for Hebrew */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Fix TextField labels in RTL */
+[dir="rtl"] .MuiInputLabel-root {
+  right: 0 !important;
+  left: auto !important;
+  transform-origin: top right !important;
+}
+
+[dir="rtl"] .MuiInputLabel-shrink {
+  transform: translate(-14px, -9px) scale(0.75) !important;
+}
+[dir="rtl"] .MuiInputLabel-root:not(.MuiInputLabel-shrink) {
+  transform: translate(-14px, 16px) scale(1) !important;
+}
+
+[dir="rtl"] .MuiOutlinedInput-notchedOutline legend {
+  text-align: right !important;
+}
+
+/* RTL specific adjustments */
+[dir="rtl"] .MuiButton-root {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+}
+
+[dir="rtl"] .MuiButton-endIcon {
+  margin: 0 !important;
+  order: 2;
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .MuiButton-startIcon {
+  margin: 0 !important;
+  order: 0;
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .MuiButton-label {
+  order: 1;
+}
+
+[dir="rtl"] .MuiChip-label {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+[dir="rtl"] .MuiAvatar-root {
+  margin-left: 8px !important;
+  margin-right: 0 !important;
+}
+
+/* Fix Stack direction in RTL */
+[dir="rtl"] .MuiStack-root {
+  direction: rtl;
+}
+
+/* Fix menu items in RTL */
+[dir="rtl"] .MuiMenuItem-root {
+  padding-right: 16px;
+  padding-left: 16px;
+  text-align: right;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #359364 0%, #24754f 100%);
+  border-radius: 10px;
+  border: 2px solid #f8fafc;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #24754f 0%, #1a5a3d 100%);
+}
+
+/* Global Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Apply animations to elements */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInFromLeft 0.6s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInFromRight 0.6s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #359364 0%, #24754f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass Morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Loading Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+/* Focus Styles */
+:focus-visible {
+  outline: 2px solid #359364;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Prevent layout shift */
+html,
+body {
+  overflow-x: hidden;
+  position: relative;
+}
+
+#root {
+  overflow-x: hidden;
+}
+
+/* Prevent MUI from adding padding when menus open */
+body {
+  padding-right: 0 !important;
+}
+
+/* Selection */
+::selection {
+  background-color: #359364;
+  color: white;
+}
+
+::-moz-selection {
+  background-color: #359364;
+  color: white;
+}
+
+/* Remove spinner from number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Utility Classes */
+.shadow-smooth {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(53, 147, 100, 0.3);
+}
+
+.border-gradient {
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+}
+
+.border-gradient::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  margin: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #359364, #24754f);
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-slide-down {
+  animation: slideDown 0.4s ease-out;
+}
+
+.animate-zoom-in {
+  animation: zoomIn 0.3s ease-out;
+}
+
+.animate-rotate {
+  animation: rotate 2s linear infinite;
+}
+
+/* Accessibility Improvements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  * {
+    border-width: 2px !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* RTL Specific Animations */
+[dir="rtl"] .animate-slide-in-left {
+  animation: slideInFromRight 0.6s ease-out;
+}
+
+[dir="rtl"] .animate-slide-in-right {
+  animation: slideInFromLeft 0.6s ease-out;
+}

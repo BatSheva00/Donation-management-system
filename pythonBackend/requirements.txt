@@ -1,0 +1,19 @@
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# AI & ML Libraries
+openai-whisper==20231117
+
+# Audio Processing
+pydub==0.25.1
+soundfile==0.12.1
+
+# Utilities
+pydantic==2.5.3
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+aiofiles==23.2.1
+requests==2.31.0
+
