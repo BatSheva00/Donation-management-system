@@ -27,12 +27,12 @@ const MyDonationsPage = () => {
       return response.data.data;
     },
     staleTime: 0,
-    gcTime: 0,
+    cacheTime: 0,
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
   });
 
-  const donations: Donation[] = (data as Donation[]) || [];
+  const donations: Donation[] = data || [];
 
   // Filter donations by status
   const filteredDonations =

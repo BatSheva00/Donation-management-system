@@ -510,7 +510,7 @@ const RequestDetailPage = () => {
               {t("requests.requester") || "Requester"}
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-              <UserAvatar initials={`${request.requesterId.firstName?.charAt(0) || ''}${request.requesterId.lastName?.charAt(0) || ''}`} sx={{ width: 56, height: 56 }} />
+              <UserAvatar user={request.requesterId} sx={{ width: 56, height: 56 }} />
               <Box>
                 <Typography variant="body1" fontWeight={600}>
                   {request.requesterId.firstName} {request.requesterId.lastName}
@@ -529,7 +529,7 @@ const RequestDetailPage = () => {
                 {t("requests.fulfilledBy") || "Fulfilled By"}
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-                <UserAvatar initials={`${request.fulfilledBy?.firstName?.charAt(0) || ''}${request.fulfilledBy?.lastName?.charAt(0) || ''}`} sx={{ width: 56, height: 56 }} />
+                <UserAvatar user={request.fulfilledBy} sx={{ width: 56, height: 56 }} />
                 <Box>
                   <Typography variant="body1" fontWeight={600}>
                     {request.fulfilledBy.firstName} {request.fulfilledBy.lastName}
@@ -549,7 +549,7 @@ const RequestDetailPage = () => {
                 {t("requests.assignedDriver") || "Assigned Driver"}
               </Typography>
               <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-                <UserAvatar initials={`${request.assignedDriverId?.firstName?.charAt(0) || ''}${request.assignedDriverId?.lastName?.charAt(0) || ''}`} sx={{ width: 56, height: 56 }} />
+                <UserAvatar user={request.assignedDriverId} sx={{ width: 56, height: 56 }} />
                 <Box>
                   <Typography variant="body1" fontWeight={600}>
                     {request.assignedDriverId.firstName} {request.assignedDriverId.lastName}

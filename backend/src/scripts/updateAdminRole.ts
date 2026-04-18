@@ -1,10 +1,9 @@
+import "../config/loadEnv";
 import mongoose from "mongoose";
 import { Role } from "../features/roles/role.model";
 import { Permission } from "../features/permissions/permission.model";
 import { logger } from "../config/logger";
-import dotenv from "dotenv";
-
-dotenv.config();
+import { getMongoConnectionString } from "../config/database";
 
 /**
  * Update admin role with all permissions (including new ones)
@@ -13,9 +12,7 @@ dotenv.config();
 async function updateAdminRole() {
   try {
     // Connect to database
-    const MONGODB_URI =
-      process.env.MONGODB_URI || "mongodb://localhost:27017/kindloop";
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(getMongoConnectionString());
     logger.info("📦 Connected to database");
 
     // Find the admin role

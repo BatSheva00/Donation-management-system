@@ -37,12 +37,12 @@ const MyRequestsPage = () => {
       return response.data.data;
     },
     staleTime: 0,
-    gcTime: 0,
+    cacheTime: 0,
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
   });
 
-  const requests: Donation[] = (data as Donation[]) || [];
+  const requests: Donation[] = data || [];
 
   // Filter by status
   const filteredRequests =

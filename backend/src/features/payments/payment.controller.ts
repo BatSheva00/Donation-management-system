@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { stripe } from "../../config/stripe";
+import { getStripe } from "../../config/stripe";
 import {
   Transaction,
   TransactionType,
@@ -30,7 +30,7 @@ export const createDonationIntent = async (
     }
 
     // Create Stripe Payment Intent
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await getStripe().paymentIntents.create({
       amount: Math.round(amount * 100), // Convert to cents
       currency: "usd",
       payment_method_types: ["card"], // Only card payments (includes Apple Pay & Google Pay)
@@ -69,7 +69,9 @@ export const confirmDonation = async (
     }
 
     // Retrieve payment intent from Stripe
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    const paymentIntent = await getStripe().paymentIntents.retrieve(
+      paymentIntentId
+    );
 
     if (paymentIntent.status !== "succeeded") {
       return next(new AppError("Payment not succeeded", 400));

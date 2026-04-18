@@ -52,8 +52,10 @@ export const DonationDialog = ({ open, onClose }: DonationDialogProps) => {
 
     try {
       setError("");
+      const apiBase =
+        import.meta.env.VITE_API_URL || "http://localhost:5000/api";
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/payments/create-donation-intent`,
+        `${apiBase}/payments/create-donation-intent`,
         {
           method: "POST",
           headers: {

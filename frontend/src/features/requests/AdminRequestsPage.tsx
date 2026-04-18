@@ -226,7 +226,7 @@ const AdminRequestsPage = () => {
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <UserAvatar
-                          initials={`${request.requesterId.firstName?.charAt(0) || ''}${request.requesterId.lastName?.charAt(0) || ''}`}
+                          user={request.requesterId}
                           sx={{ width: 32, height: 32 }}
                         />
                         <Box>

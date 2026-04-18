@@ -1,22 +1,28 @@
-import dotenv from "dotenv";
-import path from "path";
-// Load .env from backend folder
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+import "../config/loadEnv";
+import mongoose from "mongoose";
+import {
+  Transaction,
+  TransactionType,
+  TransactionStatus,
+} from "../features/payments/transaction.model";
+import { SystemBalance } from "../features/payments/systemBalance.model";
+import { getMongoConnectionString } from "../config/database";
 
 console.log("🔍 Checking environment:");
-console.log("   MONGODB_URI:", process.env.MONGODB_URI ? "✅ Loaded" : "❌ Missing");
-
-import mongoose from "mongoose";
-import { Transaction, TransactionType, TransactionStatus } from "../features/payments/transaction.model";
-import { SystemBalance } from "../features/payments/systemBalance.model";
+console.log(
+  "   Mongo:",
+  process.env.MONGO_URI ||
+    process.env.MONGODB_URI ||
+    process.env.MONGO_ATLAS_HOST
+    ? "✅ Loaded"
+    : "❌ Missing"
+);
 
 const fixSystemBalance = async () => {
   try {
-    // Connect to database
-    await mongoose.connect(process.env.MONGODB_URI as string);
+    await mongoose.connect(getMongoConnectionString());
     console.log("✅ Connected to MongoDB");
 
-    // Calculate totals from all transactions
     const allTransactions = await Transaction.find({
       status: TransactionStatus.COMPLETED,
     });
@@ -47,7 +53,6 @@ const fixSystemBalance = async () => {
     console.log(`   Total Withdrawals: $${totalWithdrawals.toFixed(2)}`);
     console.log(`   Total Transfers: $${totalTransfers.toFixed(2)}`);
 
-    // Update or create system balance
     let systemBalance = await SystemBalance.findOne({ currency: "USD" });
 
     if (!systemBalance) {
@@ -81,4 +86,3 @@ const fixSystemBalance = async () => {
 };
 
 fixSystemBalance();
-

@@ -122,7 +122,8 @@ export const NotificationsPage = () => {
     }
   };
 
-  const getNotificationIcon = (type: string) => {    // _type parameter is intentionally prefixed to avoid shadowing    return <NotificationsIcon color="primary" />;
+  const getNotificationIcon = (type: string) => {
+    return <NotificationsIcon color="primary" />;
   };
 
   return (

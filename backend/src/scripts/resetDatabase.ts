@@ -10,23 +10,22 @@
  * Run with: npx ts-node src/scripts/resetDatabase.ts
  */
 
+import "../config/loadEnv";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 import { logger } from "../config/logger";
 import { runSeeds } from "../config/seedPermissions";
 import { SystemStats } from "../features/statistics/statistics.model";
+import {
+  getMongoConnectionString,
+  redactMongoUri,
+} from "../config/database";
 
-// Load environment variables
-dotenv.config();
-
-const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  "mongodb://admin:admin123@localhost:27017/kindloop?authSource=admin";
+const MONGODB_URI = getMongoConnectionString();
 
 async function resetDatabase() {
   try {
     console.log("⚠️  WARNING: This will DELETE ALL DATA from your database!");
-    console.log("📍 Database:", MONGODB_URI);
+    console.log("📍 Database:", redactMongoUri(MONGODB_URI));
     console.log("\n⏳ Starting database reset in 3 seconds...\n");
 
     // Give user time to cancel

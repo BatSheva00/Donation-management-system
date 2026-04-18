@@ -952,11 +952,11 @@ const DonationDetailPage = () => {
                 >
                   <UserAvatar
                     src={
-                      donation.requestedBy?.profileImage
+                      donation.requestedBy.profileImage
                         ? getProfileImageUrl(donation.requestedBy)
                         : undefined
                     }
-                    initials={donation.requestedBy ? getUserInitials(donation.requestedBy) : "?"}
+                    initials={getUserInitials(donation.requestedBy)}
                     size={56}
                     isVerified={isUserVerified(donation.requestedBy)}
                     onClick={

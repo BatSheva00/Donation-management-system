@@ -1,11 +1,10 @@
+import "../config/loadEnv";
 import mongoose from "mongoose";
 import { User } from "../features/users/user.model";
 import { Role } from "../features/roles/role.model";
 import { logger } from "../config/logger";
 import { UserStatus } from "../shared/types/enums";
-import dotenv from "dotenv";
-
-dotenv.config();
+import { getMongoConnectionString } from "../config/database";
 
 /**
  * Fix admin user by assigning the admin role
@@ -15,9 +14,7 @@ dotenv.config();
 async function fixAdminUser() {
   try {
     // Connect to database
-    const MONGODB_URI =
-      process.env.MONGODB_URI || "mongodb://localhost:27017/kindloop";
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(getMongoConnectionString());
     logger.info("📦 Connected to database");
 
     // Find the admin role

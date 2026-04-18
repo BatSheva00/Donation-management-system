@@ -1,6 +1,4 @@
-// Load environment variables FIRST before any other imports
-import dotenv from "dotenv";
-dotenv.config();
+import "./config/loadEnv";
 
 import express from "express";
 import http from "http";
@@ -18,22 +16,21 @@ import routes from "./routes";
 import { initializeSocketIO } from "./config/socket";
 import { runSeeds } from "./config/seedPermissions";
 import { initializeNotificationService } from "./services/NotificationService";
-import mongoose from "mongoose";
+import { getCorsOriginOption } from "./config/corsOrigins";
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: getCorsOriginOption(),
     credentials: true,
   },
 });
 
-// Middleware
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: getCorsOriginOption(),
     credentials: true,
   })
 );
@@ -46,16 +43,14 @@ app.use(
   })
 );
 
-// Health check
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-// Serve profile images publicly (no auth required) with CORS
 app.use(
   "/uploads/profile-images",
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: getCorsOriginOption(),
     credentials: true,
   }),
   express.static(path.join(__dirname, "../uploads/profile-images"), {
@@ -65,39 +60,37 @@ app.use(
   })
 );
 
-// Note: Other uploads are protected via API routes for security
-
-// API Routes
 app.use("/api", routes);
 
-// Initialize Socket.IO
 initializeSocketIO(io);
-
-// Initialize Notification Service with Socket.IO
 initializeNotificationService(io);
 
-// Error handling
 app.use(notFound);
 app.use(errorHandler);
 
-// Start server
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
-    // Connect to database
-    await connectDB();
-    logger.info("📦 Database connected successfully");
+    if (
+      !process.env.JWT_SECRET?.trim() ||
+      !process.env.JWT_REFRESH_SECRET?.trim()
+    ) {
+      logger.error(
+        "Set JWT_SECRET and JWT_REFRESH_SECRET in backend/.env (required for auth)."
+      );
+      process.exit(1);
+    }
 
-    // Seed permissions and roles
+    await connectDB();
+
     await runSeeds();
 
     logger.info("✅ Notification service ready for real-time updates");
 
-    // Start listening
     server.listen(PORT, () => {
       logger.info(
-        `🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`
+        `🚀 Server running on port ${PORT} in ${process.env.NODE_ENV || "development"} mode`
       );
     });
   } catch (error) {
@@ -108,21 +101,14 @@ const startServer = async () => {
 
 startServer();
 
-// Handle unhandled promise rejections
-// Use 'once' to prevent multiple listeners in dev mode (nodemon restarts)
 process.removeAllListeners("unhandledRejection");
 process.once("unhandledRejection", (err: Error) => {
   logger.error("Unhandled Promise Rejection:", err);
-  // Don't crash the server - just log it
-  // In production, you might want to alert/monitor this
 });
 
-// Graceful shutdown
-// Use 'once' to prevent multiple listeners in dev mode (nodemon restarts)
 process.removeAllListeners("SIGTERM");
 process.once("SIGTERM", async () => {
   logger.info("SIGTERM signal received: closing HTTP server");
-
   server.close(() => {
     logger.info("HTTP server closed");
     process.exit(0);

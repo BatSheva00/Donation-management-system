@@ -1,0 +1,38 @@
+# Optional: local MongoDB in Docker (only if you are NOT using MongoDB Atlas).
+# Usage: docker compose -f docker-compose.yml -f docker-compose.mongodb.yml up
+# Then set backend/.env: MONGODB_URI=mongodb://admin:admin123@mongodb:27017/kindloop?authSource=admin
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: kindloop-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: kindloop
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - kindloop-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  backend:
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      # Overrides backend/.env — use local container DB when this compose file is included
+      MONGO_URI: mongodb://admin:admin123@mongodb:27017/kindloop?authSource=admin
+
+volumes:
+  mongodb_data:
+    driver: local

@@ -3,6 +3,7 @@ import {
   Typography,
   Paper,
   Stack,
+  Divider,
   Skeleton,
   alpha,
 } from "@mui/material";
@@ -63,7 +64,7 @@ export const RatingList = ({
 
   return (
     <Stack spacing={2}>
-      {ratings.map((rating) => {
+      {ratings.map((rating, index) => {
         const raterInitials = `${rating.raterId?.firstName?.[0] || ""}${rating.raterId?.lastName?.[0] || ""}`.toUpperCase();
 
         return (
