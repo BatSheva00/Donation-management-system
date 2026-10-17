@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "KindLoop Backend API - Donation Management System",
   "main": "dist/server.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "nodemon src/server.ts",
     "dev:debug": "nodemon --inspect-brk=0.0.0.0:9229 src/server.ts",
@@ -72,5 +75,9 @@
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.2"
+  },
+  "allowScripts": {
+    "bcrypt@5.1.1": true,
+    "sharp@0.34.5": true
   }
 }

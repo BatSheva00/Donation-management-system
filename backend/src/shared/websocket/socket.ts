@@ -2,6 +2,7 @@ import { Server as HTTPServer } from "http";
 import { Server, Socket } from "socket.io";
 import jwt from "jsonwebtoken";
 import { User } from "../../features/users/user.model";
+import { getCorsOriginOption } from "../../config/corsOrigins";
 
 interface AuthenticatedSocket extends Socket {
   userId?: string;
@@ -17,7 +18,7 @@ const connectedUsers = new Map<string, string>();
 export const initializeWebSocket = (server: HTTPServer) => {
   io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL || "http://localhost:5173",
+      origin: getCorsOriginOption(),
       credentials: true,
     },
   });

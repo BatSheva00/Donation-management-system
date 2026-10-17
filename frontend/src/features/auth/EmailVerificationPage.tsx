@@ -181,13 +181,15 @@ const EmailVerificationPage = () => {
             </Button>
           </Box>
 
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ display: "block", textAlign: "center", mt: 2 }}
-          >
-            {t("auth.testingCode")}
-          </Typography>
+          {!import.meta.env.PROD && (
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: "block", textAlign: "center", mt: 2 }}
+            >
+              {t("auth.testingCode")}
+            </Typography>
+          )}
         </Paper>
       </Container>
     </Box>

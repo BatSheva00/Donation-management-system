@@ -599,29 +599,43 @@ export const seedAdminUser = async () => {
   try {
     logger.info("🌱 Starting admin user seeding...");
 
-    // Check if admin user already exists
-    const existingAdmin = await User.findOne({
-      email: "admin@kindloop.com",
-    });
+    const isProduction = process.env.NODE_ENV === "production";
+    const email =
+      process.env.ADMIN_SEED_EMAIL?.trim() ||
+      (!isProduction ? "admin@kindloop.com" : "");
+    const password =
+      process.env.ADMIN_SEED_PASSWORD?.trim() ||
+      (!isProduction ? "admin@kindloop.com" : "");
 
+    if (!email || !password) {
+      logger.info(
+        "⏭️  Skipping admin seed — set ADMIN_SEED_EMAIL and ADMIN_SEED_PASSWORD to create an admin"
+      );
+      return;
+    }
+
+    if (isProduction && password.length < 12) {
+      throw new Error(
+        "ADMIN_SEED_PASSWORD must be at least 12 characters in production"
+      );
+    }
+
+    const existingAdmin = await User.findOne({ email });
     if (existingAdmin) {
       logger.info("⏭️  Admin user already exists");
       return;
     }
 
-    // Get admin role
     const adminRole = await Role.findOne({ key: "admin" });
     if (!adminRole) {
       logger.error("❌ Admin role not found. Please run role seeding first.");
       throw new Error("Admin role not found");
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash("admin@kindloop.com", 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create admin user
     await User.create({
-      email: "admin@kindloop.com",
+      email,
       password: hashedPassword,
       firstName: "Admin",
       lastName: "User",
@@ -643,9 +657,10 @@ export const seedAdminUser = async () => {
       },
     });
 
-    logger.info("✅ Admin user created successfully");
-    logger.info("📧 Email: admin@kindloop.com");
-    logger.info("🔑 Password: admin@kindloop.com");
+    logger.info(`✅ Admin user created: ${email}`);
+    if (!isProduction) {
+      logger.info(`🔑 Password: ${password}`);
+    }
   } catch (error) {
     logger.error("❌ Error seeding admin user:", error);
     throw error;

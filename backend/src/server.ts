@@ -19,6 +19,7 @@ import { initializeNotificationService } from "./services/NotificationService";
 import { getCorsOriginOption } from "./config/corsOrigins";
 
 const app = express();
+app.set("trust proxy", 1);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -88,7 +89,7 @@ const startServer = async () => {
 
     logger.info("✅ Notification service ready for real-time updates");
 
-    server.listen(PORT, () => {
+    server.listen(Number(PORT), "0.0.0.0", () => {
       logger.info(
         `🚀 Server running on port ${PORT} in ${process.env.NODE_ENV || "development"} mode`
       );

@@ -12,6 +12,8 @@ import { getCurrentUser } from "./shared/services/userService";
 import HomePage from "./features/home/HomePage";
 import LoginPage from "./features/auth/LoginPage";
 import RegisterPage from "./features/auth/RegisterPage";
+import ForgotPasswordPage from "./features/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./features/auth/ResetPasswordPage";
 import EmailVerificationPage from "./features/auth/EmailVerificationPage";
 import ProfileCompletionPage from "./features/auth/ProfileCompletionPage";
 import DashboardPage from "./features/dashboard/DashboardPage";
@@ -124,6 +126,11 @@ function App() {
           <Route element={<GuestRoute />}>
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
+            <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            <Route
+              path="reset-password/:token"
+              element={<ResetPasswordPage />}
+            />
           </Route>
 
           <Route path="verify-email" element={<EmailVerificationPage />} />

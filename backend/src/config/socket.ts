@@ -23,8 +23,6 @@ export const initializeSocketIO = (io: Server): void => {
   io.use(async (socket: Socket, next) => {
     const token = socket.handshake.auth.token || socket.handshake.headers.authorization?.split(' ')[1];
     
-    console.log('🔐 WebSocket auth attempt - Token:', token ? token.substring(0, 20) + '...' : 'NONE');
-    
     if (!token) {
       return next(new Error('Authentication error: No token provided'));
     }

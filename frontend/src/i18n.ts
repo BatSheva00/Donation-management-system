@@ -568,6 +568,19 @@ const resources = {
         resendCode: "Resend Code",
         testingCode: "For testing, use code: 000000",
         invalidVerificationLink: "Invalid verification link",
+        forgotPasswordTitle: "Reset your password",
+        forgotPasswordSubtitle:
+          "Enter your email and we will send a reset link.",
+        sendResetLink: "Send reset link",
+        resetLinkSent: "If that email exists, a reset link has been sent.",
+        resetLinkFailed: "Could not send reset email",
+        resetPasswordTitle: "Choose a new password",
+        resetPasswordSubtitle: "Enter a new password for your account.",
+        newPassword: "New password",
+        confirmPassword: "Confirm password",
+        passwordResetSuccess: "Password updated. You can sign in now.",
+        invalidResetLink: "This reset link is invalid or has expired.",
+        backToLogin: "Back to sign in",
       },
       home: {
         hero: {
@@ -1560,6 +1573,18 @@ const resources = {
         resendCode: "שלח קוד מחדש",
         testingCode: "לבדיקה, השתמש בקוד: 000000",
         invalidVerificationLink: "קישור אימות לא תקין",
+        forgotPasswordTitle: "איפוס סיסמה",
+        forgotPasswordSubtitle: "הזן את האימייל שלך ונשלח קישור לאיפוס.",
+        sendResetLink: "שלח קישור לאיפוס",
+        resetLinkSent: "אם האימייל קיים במערכת, נשלח אליו קישור לאיפוס.",
+        resetLinkFailed: "שליחת מייל האיפוס נכשלה",
+        resetPasswordTitle: "בחירת סיסמה חדשה",
+        resetPasswordSubtitle: "הזן סיסמה חדשה לחשבון.",
+        newPassword: "סיסמה חדשה",
+        confirmPassword: "אימות סיסמה",
+        passwordResetSuccess: "הסיסמה עודכנה. אפשר להתחבר עכשיו.",
+        invalidResetLink: "קישור האיפוס לא תקין או שפג תוקפו.",
+        backToLogin: "חזרה להתחברות",
       },
       home: {
         hero: {

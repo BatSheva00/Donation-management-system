@@ -13,6 +13,12 @@ import { UserStatus, ProfileCompletionStatus } from "../../shared/types/enums";
 import { v4 as uuidv4 } from "uuid";
 import { logger } from "../../config/logger";
 import { onUserRegistered } from "../../services/StatsService";
+import {
+  assertEmailReadyForProduction,
+  generateVerificationCode,
+  sendPasswordResetEmail,
+  sendVerificationCodeEmail,
+} from "../../services/email.service";
 
 export const register = async (
   req: Request,
@@ -47,19 +53,11 @@ export const register = async (
       throw new AppError(`Role '${roleKeyToUse}' not found`, 400);
     }
 
+    assertEmailReadyForProduction();
+
     const hashedPassword = await hashPassword(password);
-
-    // Generate 6-digit verification code
-    const emailVerificationCode = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
-    const emailVerificationExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
-
-    logger.debug("Generated verification code:", {
-      code: emailVerificationCode,
-      type: typeof emailVerificationCode,
-      expiry: emailVerificationExpires,
-    });
+    const { code: emailVerificationCode, expires: emailVerificationExpires } =
+      generateVerificationCode();
 
     const user = await User.create({
       email,
@@ -82,8 +80,14 @@ export const register = async (
     );
     logger.debug(`✅ Verification code saved for ${email}:`, {
       userId: user._id,
-      code: savedUser?.emailVerificationCode,
       storedType: typeof savedUser?.emailVerificationCode,
+    });
+
+    await sendVerificationCodeEmail({
+      to: user.email,
+      code: emailVerificationCode,
+      firstName: user.firstName,
+      language: user.language,
     });
 
     res.status(201).json({
@@ -317,7 +321,9 @@ export const verifyEmail = async (
       receivedType: typeof code,
     });
 
-    if (user.emailVerificationCode !== code && code !== "000000") {
+    const allowDevBypass =
+      process.env.NODE_ENV !== "production" && code === "000000";
+    if (user.emailVerificationCode !== code && !allowDevBypass) {
       throw new AppError("Invalid verification code", 400);
     }
 
@@ -355,20 +361,21 @@ export const resendVerificationCode = async (
       throw new AppError("Email already verified", 400);
     }
 
-    // Generate new 6-digit code
-    const emailVerificationCode = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString();
-    const emailVerificationExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    assertEmailReadyForProduction();
+
+    const { code: emailVerificationCode, expires: emailVerificationExpires } =
+      generateVerificationCode();
 
     user.emailVerificationCode = emailVerificationCode;
     user.emailVerificationExpires = emailVerificationExpires;
     await user.save();
 
-    // TODO: Send verification email with new code
-    logger.debug(
-      `New verification code for ${user.email}: ${emailVerificationCode}`
-    );
+    await sendVerificationCodeEmail({
+      to: user.email,
+      code: emailVerificationCode,
+      firstName: user.firstName,
+      language: user.language,
+    });
 
     res.json({
       success: true,
@@ -387,9 +394,11 @@ export const forgotPassword = async (
   try {
     const { email } = req.body;
 
+    assertEmailReadyForProduction();
+
     const user = await User.findOne({ email });
     if (!user) {
-      // Don't reveal if user exists
+      logger.info(`Password reset requested for unknown email: ${email}`);
       res.json({
         success: true,
         message: "If the email exists, a password reset link has been sent.",
@@ -402,7 +411,12 @@ export const forgotPassword = async (
     user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
     await user.save();
 
-    // TODO: Send reset password email
+    await sendPasswordResetEmail({
+      to: user.email,
+      token: resetToken,
+      firstName: user.firstName,
+      language: user.language,
+    });
 
     res.json({
       success: true,
