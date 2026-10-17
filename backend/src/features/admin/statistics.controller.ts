@@ -4,8 +4,9 @@
  */
 
 import { Request, Response } from "express";
-import { changeStreamManager } from "../../server";
 import { logger } from "../../config/logger";
+
+const changeStreamManager: { getStats: () => unknown } | null = null;
 
 /**
  * Get current system statistics
