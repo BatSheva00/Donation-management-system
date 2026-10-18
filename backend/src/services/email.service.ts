@@ -67,20 +67,38 @@ function escapeHtml(value: string): string {
 
 let smtpTransporter: Transporter | null = null;
 
-function getSmtpTransporter(): Transporter {
-  if (!smtpTransporter) {
-    const port = Number(process.env.SMTP_PORT || 587);
-    smtpTransporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port,
-      secure: process.env.SMTP_SECURE === "true" || port === 465,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-  }
-  return smtpTransporter;
+function smtpPassword(): string {
+  return (process.env.SMTP_PASS || "").replace(/\s+/g, "");
+}
+
+function smtpAttempts(): { port: number; secure: boolean }[] {
+  const configured = Number(process.env.SMTP_PORT || 587);
+  const first = {
+    port: configured,
+    secure:
+      process.env.SMTP_SECURE === "true" || configured === 465,
+  };
+  const fallback =
+    first.port === 465
+      ? { port: 587, secure: false }
+      : { port: 465, secure: true };
+  return [first, fallback];
+}
+
+function createSmtpTransporter(port: number, secure: boolean): Transporter {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port,
+    secure,
+    requireTLS: !secure,
+    connectionTimeout: 12000,
+    greetingTimeout: 12000,
+    socketTimeout: 20000,
+    auth: {
+      user: process.env.SMTP_USER?.trim(),
+      pass: smtpPassword(),
+    },
+  });
 }
 
 async function sendViaResend(
@@ -127,15 +145,59 @@ async function deliverEmail(
     process.env.SMTP_USER?.trim() &&
     process.env.SMTP_PASS?.trim()
   ) {
-    await getSmtpTransporter().sendMail({
-      from: fromAddress(),
-      to,
-      subject,
-      html,
-      text,
-    });
-    logger.info(`Email sent via SMTP to ${to}: ${subject}`);
-    return;
+    let lastError: unknown;
+    if (smtpTransporter) {
+      try {
+        await smtpTransporter.sendMail({
+          from: fromAddress(),
+          to,
+          subject,
+          html,
+          text,
+        });
+        logger.info(`Email sent via SMTP to ${to}: ${subject}`);
+        return;
+      } catch (error) {
+        lastError = error;
+        smtpTransporter = null;
+        logger.warn(
+          `Cached SMTP connection failed: ${
+            error instanceof Error ? error.message : String(error)
+          }`
+        );
+      }
+    }
+    for (const attempt of smtpAttempts()) {
+      try {
+        const transporter = createSmtpTransporter(
+          attempt.port,
+          attempt.secure
+        );
+        await transporter.sendMail({
+          from: fromAddress(),
+          to,
+          subject,
+          html,
+          text,
+        });
+        smtpTransporter = transporter;
+        logger.info(
+          `Email sent via SMTP:${attempt.port} to ${to}: ${subject}`
+        );
+        return;
+      } catch (error) {
+        lastError = error;
+        logger.warn(
+          `SMTP ${attempt.port} failed (${attempt.secure ? "SSL" : "STARTTLS"}): ${
+            error instanceof Error ? error.message : String(error)
+          }`
+        );
+      }
+    }
+    logger.error(
+      "Gmail SMTP timed out from this host (common on Render). Set RESEND_API_KEY so mail goes over HTTPS instead of SMTP."
+    );
+    throw lastError;
   }
 
   if (isProduction()) {
