@@ -6,10 +6,15 @@ type MailLang = "en" | "he";
 
 const isProduction = (): boolean => process.env.NODE_ENV === "production";
 
-export function isEmailConfigured(): boolean {
-  if (process.env.RESEND_API_KEY?.trim()) {
-    return true;
-  }
+function hasHttpsMail(): boolean {
+  return Boolean(
+    process.env.RESEND_API_KEY?.trim() ||
+      process.env.BREVO_API_KEY?.trim() ||
+      process.env.MAIL_WEBHOOK_URL?.trim()
+  );
+}
+
+function hasSmtpMail(): boolean {
   return Boolean(
     process.env.SMTP_HOST?.trim() &&
       process.env.SMTP_USER?.trim() &&
@@ -17,10 +22,14 @@ export function isEmailConfigured(): boolean {
   );
 }
 
+export function isEmailConfigured(): boolean {
+  return hasHttpsMail() || hasSmtpMail();
+}
+
 export function assertEmailReadyForProduction(): void {
   if (isProduction() && !isEmailConfigured()) {
     throw new AppError(
-      "Email delivery is not configured. Set RESEND_API_KEY or SMTP_HOST, SMTP_USER, and SMTP_PASS.",
+      "Email delivery is not configured. Set RESEND_API_KEY, BREVO_API_KEY, or MAIL_WEBHOOK_URL (Gmail SMTP is blocked on Render).",
       503
     );
   }
@@ -101,6 +110,15 @@ function createSmtpTransporter(port: number, secure: boolean): Transporter {
   });
 }
 
+function parseFromAddress(): { name?: string; email: string } {
+  const raw = fromAddress();
+  const match = raw.match(/^(.*)<([^>]+)>$/);
+  if (match) {
+    return { name: match[1].trim().replace(/^"|"$/g, ""), email: match[2].trim() };
+  }
+  return { email: raw.trim() };
+}
+
 async function sendViaResend(
   to: string,
   subject: string,
@@ -128,6 +146,63 @@ async function sendViaResend(
   }
 }
 
+async function sendViaBrevo(
+  to: string,
+  subject: string,
+  html: string,
+  text: string
+): Promise<void> {
+  const sender = parseFromAddress();
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "api-key": process.env.BREVO_API_KEY!.trim(),
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      sender: sender.name
+        ? { name: sender.name, email: sender.email }
+        : { email: sender.email },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+      textContent: text,
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Brevo failed (${response.status}): ${body}`);
+  }
+}
+
+async function sendViaMailWebhook(
+  to: string,
+  subject: string,
+  html: string,
+  text: string
+): Promise<void> {
+  const response = await fetch(process.env.MAIL_WEBHOOK_URL!.trim(), {
+    method: "POST",
+    redirect: "follow",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      secret: process.env.MAIL_WEBHOOK_SECRET || "",
+      to,
+      subject,
+      html,
+      text,
+      from: fromAddress(),
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Mail webhook failed (${response.status}): ${body}`);
+  }
+}
+
 async function deliverEmail(
   to: string,
   subject: string,
@@ -140,11 +215,19 @@ async function deliverEmail(
     return;
   }
 
-  if (
-    process.env.SMTP_HOST?.trim() &&
-    process.env.SMTP_USER?.trim() &&
-    process.env.SMTP_PASS?.trim()
-  ) {
+  if (process.env.BREVO_API_KEY?.trim()) {
+    await sendViaBrevo(to, subject, html, text);
+    logger.info(`Email sent via Brevo to ${to}: ${subject}`);
+    return;
+  }
+
+  if (process.env.MAIL_WEBHOOK_URL?.trim()) {
+    await sendViaMailWebhook(to, subject, html, text);
+    logger.info(`Email sent via webhook to ${to}: ${subject}`);
+    return;
+  }
+
+  if (hasSmtpMail() && !isProduction()) {
     let lastError: unknown;
     if (smtpTransporter) {
       try {
@@ -201,7 +284,10 @@ async function deliverEmail(
   }
 
   if (isProduction()) {
-    throw new AppError("Email delivery is not configured.", 503);
+    throw new AppError(
+      "Gmail SMTP is blocked on this host. Set MAIL_WEBHOOK_URL or BREVO_API_KEY.",
+      502
+    );
   }
 
   logger.warn(`[dev email — not delivered] To: ${to} | ${subject}\n${text}`);
