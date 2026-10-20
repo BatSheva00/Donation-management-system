@@ -5,7 +5,16 @@ import Footer from './Footer';
 
 const Layout = () => {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        width: "100%",
+        maxWidth: "100%",
+        overflowX: "hidden",
+      }}
+    >
       <Navbar />
       <Box
         component="main"

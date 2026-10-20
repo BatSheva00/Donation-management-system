@@ -72,7 +72,9 @@ const Navbar = () => {
 
   const handleLanguageChange = (lang: string) => {
     i18n.changeLanguage(lang);
-    document.documentElement.dir = lang === "he" ? "rtl" : "ltr";
+    document.documentElement.dir = lang.toLowerCase().startsWith("he")
+      ? "rtl"
+      : "ltr";
     handleClose();
   };
 
@@ -97,7 +99,14 @@ const Navbar = () => {
         }}
       >
         <Container maxWidth="xl">
-          <Toolbar sx={{ py: 1 }}>
+          <Toolbar
+            sx={{
+              py: 1,
+              minWidth: 0,
+              px: { xs: 0, sm: 1 },
+              gap: 0.5,
+            }}
+          >
             <Box
               component={Link}
               to="/"

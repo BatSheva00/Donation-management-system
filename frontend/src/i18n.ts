@@ -2175,13 +2175,14 @@ i18n.use(initReactI18next).init({
 
 // Set document direction based on language
 i18n.on("languageChanged", (lng) => {
-  document.documentElement.dir = lng === "he" ? "rtl" : "ltr";
+  const hebrew = lng.toLowerCase().startsWith("he");
+  document.documentElement.dir = hebrew ? "rtl" : "ltr";
   document.documentElement.lang = lng;
   localStorage.setItem("language", lng);
 });
 
-// Set initial direction
-document.documentElement.dir = i18n.language === "he" ? "rtl" : "ltr";
+const initialHebrew = i18n.language.toLowerCase().startsWith("he");
+document.documentElement.dir = initialHebrew ? "rtl" : "ltr";
 document.documentElement.lang = i18n.language;
 
 export default i18n;
