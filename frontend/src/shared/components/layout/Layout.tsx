@@ -9,10 +9,10 @@ const Layout = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        minHeight: "100dvh",
+        minHeight: "100vh",
         width: "100%",
         maxWidth: "100%",
-        overflowX: "clip" as const,
+        overflowX: "hidden",
       }}
     >
       <Navbar />

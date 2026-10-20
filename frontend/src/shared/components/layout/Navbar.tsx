@@ -11,10 +11,6 @@ import {
   MenuItem,
   Box,
   Container,
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemText,
   useScrollTrigger,
   useMediaQuery,
   Slide,
@@ -47,7 +43,7 @@ const Navbar = () => {
   const { isAuthenticated, user, clearAuth, hasPermission } = useAuthStore();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [langAnchorEl, setLangAnchorEl] = useState<null | HTMLElement>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileAnchor, setMobileAnchor] = useState<null | HTMLElement>(null);
   const isDesktop = useMediaQuery("(min-width:900px)");
   
   // Initialize WebSocket for notifications
@@ -169,33 +165,29 @@ const Navbar = () => {
 
             <IconButton
               aria-label={t("nav.menu") || "Menu"}
-              onClick={() => setMobileOpen(true)}
+              onClick={(event) => setMobileAnchor(event.currentTarget)}
               sx={{ display: { xs: "inline-flex", md: "none" }, mr: 0.5 }}
             >
               <MenuIcon />
             </IconButton>
-            <Drawer
-              anchor={i18n.language.toLowerCase().startsWith("he") ? "right" : "left"}
-              open={mobileOpen}
-              onClose={() => setMobileOpen(false)}
+            <Menu
+              anchorEl={mobileAnchor}
+              open={Boolean(mobileAnchor)}
+              onClose={() => setMobileAnchor(null)}
               disableScrollLock
             >
-              <Box sx={{ width: 260, pt: 2 }} role="presentation">
-                <List>
-                  {mobileLinks.map((item) => (
-                    <ListItemButton
-                      key={item.to}
-                      component={Link}
-                      to={item.to}
-                      selected={isActive(item.to)}
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      <ListItemText primary={item.label} />
-                    </ListItemButton>
-                  ))}
-                </List>
-              </Box>
-            </Drawer>
+              {mobileLinks.map((item) => (
+                <MenuItem
+                  key={item.to}
+                  component={Link}
+                  to={item.to}
+                  selected={isActive(item.to)}
+                  onClick={() => setMobileAnchor(null)}
+                >
+                  {item.label}
+                </MenuItem>
+              ))}
+            </Menu>
 
             <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
               {isAuthenticated ? (

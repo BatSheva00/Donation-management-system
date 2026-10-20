@@ -15,6 +15,19 @@ class ErrorBoundary extends Component<Props, State> {
     return { hasError: true };
   }
 
+  componentDidCatch(error: Error) {
+    console.error("KindLoop crashed:", error);
+  }
+
+  handleReload = () => {
+    try {
+      window.localStorage.removeItem("language");
+    } catch {
+      // ignore
+    }
+    window.location.replace("/");
+  };
+
   render() {
     if (this.state.hasError) {
       return (
@@ -32,12 +45,15 @@ class ErrorBoundary extends Component<Props, State> {
           }}
         >
           <h1 style={{ margin: 0, color: "#359364" }}>KindLoop</h1>
+          <p style={{ color: "#64748b", maxWidth: 360, direction: "rtl" }}>
+            הדף לא נטען. לחצי על רענון ונסי שוב.
+          </p>
           <p style={{ color: "#64748b", maxWidth: 360 }}>
             The page failed to load. Refresh and try again.
           </p>
           <button
             type="button"
-            onClick={() => window.location.reload()}
+            onClick={this.handleReload}
             style={{
               background: "#359364",
               color: "white",
@@ -47,7 +63,7 @@ class ErrorBoundary extends Component<Props, State> {
               fontWeight: 600,
             }}
           >
-            Reload
+            Reload / רענון
           </button>
         </div>
       );
