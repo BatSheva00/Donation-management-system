@@ -54,7 +54,7 @@ const Footer = () => {
       }}
     >
       <Container maxWidth="lg">
-        <Grid container spacing={{ xs: 3, md: 4 }} sx={{ m: 0, width: "100%" }}>
+        <Grid container spacing={4}>
           {/* Brand Section */}
           <Grid item xs={12} md={4}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
@@ -120,12 +120,9 @@ const Footer = () => {
                       textDecoration: 'none',
                       fontSize: '0.875rem',
                       transition: 'all 0.2s ease',
-                      "&:hover": {
-                        color: "white",
-                        transform: "translateX(-4px)",
-                        "[dir='ltr'] &": {
-                          transform: "translateX(4px)",
-                        },
+                      '&:hover': {
+                        color: 'white',
+                        transform: 'translateX(4px)',
                       },
                     }}
                   >

@@ -1,6 +1,5 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import { readStoredItem, writeStoredItem } from "./shared/utils/safeStorage";
 
 const resources = {
   en: {
@@ -2177,7 +2176,7 @@ const resources = {
 
 i18n.use(initReactI18next).init({
   resources,
-  lng: readStoredItem("language") || "en",
+  lng: localStorage.getItem("language") || "en",
   fallbackLng: "en",
   interpolation: {
     escapeValue: false,
@@ -2186,14 +2185,13 @@ i18n.use(initReactI18next).init({
 
 // Set document direction based on language
 i18n.on("languageChanged", (lng) => {
-  const hebrew = lng.toLowerCase().startsWith("he");
-  document.documentElement.dir = hebrew ? "rtl" : "ltr";
+  document.documentElement.dir = lng === "he" ? "rtl" : "ltr";
   document.documentElement.lang = lng;
-  writeStoredItem("language", lng);
+  localStorage.setItem("language", lng);
 });
 
-const initialHebrew = i18n.language.toLowerCase().startsWith("he");
-document.documentElement.dir = initialHebrew ? "rtl" : "ltr";
+// Set initial direction
+document.documentElement.dir = i18n.language === "he" ? "rtl" : "ltr";
 document.documentElement.lang = i18n.language;
 
 export default i18n;

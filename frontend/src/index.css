@@ -149,6 +149,7 @@ body {
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 /* Fix autocomplete background to cover full width including icon areas */
@@ -201,9 +202,41 @@ body {
 }
 
 /* RTL specific adjustments */
+[dir="rtl"] .MuiButton-root {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+}
+
+[dir="rtl"] .MuiButton-endIcon {
+  margin: 0 !important;
+  order: 2;
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .MuiButton-startIcon {
+  margin: 0 !important;
+  order: 0;
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .MuiButton-label {
+  order: 1;
+}
+
 [dir="rtl"] .MuiChip-label {
   padding-left: 12px !important;
   padding-right: 12px !important;
+}
+
+[dir="rtl"] .MuiAvatar-root {
+  margin-left: 8px !important;
+  margin-right: 0 !important;
+}
+
+/* Fix Stack direction in RTL */
+[dir="rtl"] .MuiStack-root {
+  direction: rtl;
 }
 
 /* Fix menu items in RTL */
@@ -413,37 +446,20 @@ body {
   border-radius: 4px;
 }
 
+/* Prevent layout shift */
 html,
 body {
   overflow-x: hidden;
-  max-width: 100%;
+  position: relative;
 }
 
 #root {
   overflow-x: hidden;
-  max-width: 100%;
 }
 
-/* Prevent MUI scrollbar compensation from shifting the layout in LTR or RTL */
+/* Prevent MUI from adding padding when menus open */
 body {
   padding-right: 0 !important;
-  padding-left: 0 !important;
-}
-
-/* MUI Grid uses negative physical margins. Without stylis-rtl this spills off-screen in Hebrew. */
-[dir="rtl"] .MuiGrid-container {
-  width: 100% !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-
-[dir="rtl"] .MuiContainer-root,
-[dir="rtl"] .MuiToolbar-root {
-  max-width: 100%;
-}
-
-[dir="rtl"] .MuiStack-root {
-  min-width: 0;
 }
 
 /* Selection */

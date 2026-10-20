@@ -6,7 +6,6 @@ import { ToastContainer } from "react-toastify";
 import { I18nextProvider } from "react-i18next";
 import App from "./App";
 import ThemeWrapper from "./shared/components/shared/ThemeWrapper";
-import ErrorBoundary from "./shared/components/shared/ErrorBoundary";
 import i18n from "./i18n";
 import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -24,17 +23,20 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <I18nextProvider i18n={i18n}>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <ThemeWrapper>
-          <ErrorBoundary>
-            <App />
-          </ErrorBoundary>
+          <App />
           <ToastContainer
             autoClose={1000}
             hideProgressBar={false}
             newestOnTop={false}
             closeOnClick={false}
-            rtl={i18n.language?.startsWith("he")}
+            rtl={i18n.language === "he"}
             pauseOnFocusLoss={false}
             draggable={false}
             pauseOnHover={true}

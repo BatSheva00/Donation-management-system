@@ -1,36 +1,31 @@
-import { ReactNode, useMemo } from "react";
-import { ThemeProvider, CssBaseline } from "@mui/material";
-import { CacheProvider } from "@emotion/react";
-import createCache from "@emotion/cache";
-import { useTranslation } from "react-i18next";
-import { createAppTheme } from "../../../theme";
-
-const cacheLtr = createCache({ key: "muiltr", prepend: true });
+import { ReactNode, useMemo } from 'react';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { createAppTheme } from '../../../theme';
 
 interface ThemeWrapperProps {
   children: ReactNode;
 }
 
-const isHebrew = (language?: string) =>
-  Boolean(language && language.toLowerCase().startsWith("he"));
-
 const ThemeWrapper = ({ children }: ThemeWrapperProps) => {
   const { i18n } = useTranslation();
-  const rtl = isHebrew(i18n.language);
 
-  const theme = useMemo(
-    () => createAppTheme(rtl ? "rtl" : "ltr"),
-    [rtl]
-  );
+  const theme = useMemo(() => {
+    const direction = i18n.language === 'he' ? 'rtl' : 'ltr';
+    return createAppTheme(direction);
+  }, [i18n.language]);
 
   return (
-    <CacheProvider value={cacheLtr}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
-    </CacheProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {children}
+    </ThemeProvider>
   );
 };
 
 export default ThemeWrapper;
+
+
+
+
+
