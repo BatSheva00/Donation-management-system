@@ -55,6 +55,17 @@ app.use(
   })
 );
 
+app.get("/", (_req, res) => {
+  const frontend = (process.env.FRONTEND_URL || "").replace(/\/$/, "");
+  res.status(200).json({
+    success: true,
+    service: "KindLoop API",
+    health: "/health",
+    api: "/api",
+    app: frontend || undefined,
+  });
+});
+
 app.get("/health", (req, res) => {
   const production = process.env.NODE_ENV === "production";
   res.status(200).json({
