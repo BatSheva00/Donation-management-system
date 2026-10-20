@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import api from "../../../lib/axios";
-import { Donation, DonationResponse, DonationFilters, DonationStatus } from "../types/donation.types";
+import { Donation, DonationResponse, DonationFilters } from "../types/donation.types";
 
 export const useDonations = () => {
   const [filters, setFilters] = useState<DonationFilters>({
-    status: DonationStatus.PENDING, // Default to pending donations
     page: 1,
-    limit: 10,
+    limit: 12,
     sortBy: "createdAt",
     sortOrder: "desc",
   });

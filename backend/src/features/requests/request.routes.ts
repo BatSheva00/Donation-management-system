@@ -2,14 +2,14 @@ import express from "express";
 import {
   authenticate,
   authorize,
+  optionalAuthenticate,
 } from "../../shared/middleware/auth.middleware";
 import * as requestController from "./request.controller";
 
 const router = express.Router();
 
-// Public routes (authenticated users only)
-router.get("/", authenticate, requestController.getRequests);
-router.get("/:id", authenticate, requestController.getRequestById);
+router.get("/", optionalAuthenticate, requestController.getRequests);
+router.get("/:id", optionalAuthenticate, requestController.getRequestById);
 
 // User routes
 router.post("/", authenticate, requestController.createRequest);

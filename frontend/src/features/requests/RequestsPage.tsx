@@ -21,7 +21,7 @@ import { useAuthStore } from "../../shared/stores/authStore";
 
 export const RequestsPage = () => {
   const { t } = useTranslation();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const [tab, setTab] = useState<"all" | "food" | "clothing" | "other">("all");
   const [page, setPage] = useState(1);
   const [openCreateModal, setOpenCreateModal] = useState(false);
@@ -117,6 +117,11 @@ export const RequestsPage = () => {
             </Button>
           )}
       </Box>
+      {!isAuthenticated && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          {t("guest.banner")}
+        </Alert>
+      )}
 
       {/* Filter Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>

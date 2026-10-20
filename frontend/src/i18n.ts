@@ -595,10 +595,10 @@ const resources = {
       },
       guest: {
         banner:
-          "You are browsing as a guest. You can open one donation. Register to request, share, or download.",
-        limitTitle: "Register to keep browsing",
+          "You are browsing as a guest. You can see all listings. Register to request, contact donors, or create donations.",
+        limitTitle: "Register to take action",
         limitBody:
-          "Guests can preview a single donation. Create a free account to request items, contact donors, and see more listings.",
+          "Create a free account to request items, contact donors, and manage donations.",
         preview: "Guest preview",
         registerToContinue: "Create a free account",
         noDownload: "Download and sharing are available after you register.",
@@ -626,6 +626,11 @@ const resources = {
           activeUsers: "Active Users",
           volunteers: "Active Volunteers",
           businesses: "Partner Businesses",
+        },
+        featured: {
+          title: "Latest donations",
+          subtitle: "Browse every listing without creating an account",
+          viewAll: "View all donations",
         },
         categories: {
           title: "Donation Categories",
@@ -1621,10 +1626,10 @@ const resources = {
       },
       guest: {
         banner:
-          "את צופה כאורחת. אפשר לפתוח תרומה אחת. כדי לבקש, לשתף או להוריד צריך להירשם.",
-        limitTitle: "כדי להמשיך צריך להירשם",
+          "את צופה כאורחת. אפשר לראות את כל התרומות והבקשות. כדי לבקש, ליצור קשר עם תורמים או לפרסם תרומה צריך להירשם.",
+        limitTitle: "כדי לפעול צריך להירשם",
         limitBody:
-          "אורחים יכולים לראות תרומה אחת במלואה. פתחי חשבון חינם כדי לבקש פריטים, ליצור קשר עם תורמים ולראות עוד מודעות.",
+          "פתחי חשבון חינם כדי לבקש פריטים, ליצור קשר עם תורמים ולנהל תרומות.",
         preview: "תצוגת אורח",
         registerToContinue: "יצירת חשבון חינם",
         noDownload: "הורדה ושיתוף זמינים רק אחרי הרשמה.",
@@ -1651,6 +1656,11 @@ const resources = {
           activeUsers: "משתמשים פעילים",
           volunteers: "מתנדבים פעילים",
           businesses: "עסקים שותפים",
+        },
+        featured: {
+          title: "תרומות אחרונות",
+          subtitle: "אפשר לראות את כל התרומות בלי להירשם",
+          viewAll: "לכל התרומות",
         },
         categories: {
           title: "קטגוריות תרומה",

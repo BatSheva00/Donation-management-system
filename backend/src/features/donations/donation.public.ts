@@ -1,9 +1,6 @@
 import { DonationStatus } from "../../shared/types/enums";
 
-export const GUEST_VISIBLE_STATUSES = [
-  DonationStatus.PENDING,
-  DonationStatus.APPROVED,
-];
+export const GUEST_VISIBLE_STATUSES = Object.values(DonationStatus);
 
 const PUBLIC_DONOR_FIELDS = "firstName lastName profileImage profileCompletionStatus donorRating donorRatingCount";
 

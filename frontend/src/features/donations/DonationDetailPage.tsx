@@ -45,7 +45,6 @@ import api from "../../lib/axios";
 import { Donation, DonationStatus } from "./types/donation.types";
 import { getProfileImageUrl, getUserInitials, isUserVerified, resolveMediaUrl } from "../../utils/userUtils";
 import { useAuthStore } from "../../shared/stores/authStore";
-import { claimGuestPreview } from "../../shared/utils/guestPreview";
 import { aiFeaturesEnabled } from "../../shared/utils/aiFeatures";
 import { DeliveryRequestDialog } from "./components/DeliveryRequestDialog";
 import { DriverStatusButton } from "./components/DriverStatusButton";
@@ -62,7 +61,6 @@ const DonationDetailPage = () => {
   const { t } = useTranslation();
   const { user, hasPermission, isAuthenticated } = useAuthStore();
   const isGuest = !isAuthenticated;
-  const canOpenThisPreview = !isGuest || !id || claimGuestPreview(id);
   const queryClient = useQueryClient();
   const [translatedDescription, setTranslatedDescription] = useState<
     string | null
@@ -334,34 +332,6 @@ const DonationDetailPage = () => {
     );
   }
 
-  const guestLimitReached =
-    isGuest &&
-    (error as { response?: { status?: number } })?.response?.status === 403;
-
-  if (guestLimitReached) {
-    return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Paper sx={{ p: 4, textAlign: "center" }}>
-          <Typography variant="h5" fontWeight={700} gutterBottom>
-            {t("guest.limitTitle")}
-          </Typography>
-          <Typography color="text.secondary" sx={{ mb: 3 }}>
-            {t("guest.limitBody")}
-          </Typography>
-          <Button
-            variant="contained"
-            onClick={() => navigate("/register")}
-            sx={{
-              background: "linear-gradient(135deg, #359364 0%, #24754f 100%)",
-            }}
-          >
-            {t("guest.registerToContinue")}
-          </Button>
-        </Paper>
-      </Container>
-    );
-  }
-
   if (error || !donation) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -539,27 +509,7 @@ const DonationDetailPage = () => {
         </Alert>
       )}
 
-      {!canOpenThisPreview && (
-        <Paper sx={{ p: 4, mb: 3, textAlign: "center" }}>
-          <Typography variant="h5" fontWeight={700} gutterBottom>
-            {t("guest.limitTitle")}
-          </Typography>
-          <Typography color="text.secondary" sx={{ mb: 3 }}>
-            {t("guest.limitBody")}
-          </Typography>
-          <Button
-            variant="contained"
-            onClick={() => navigate("/register")}
-            sx={{
-              background: "linear-gradient(135deg, #359364 0%, #24754f 100%)",
-            }}
-          >
-            {t("guest.registerToContinue")}
-          </Button>
-        </Paper>
-      )}
-
-      <Grid container spacing={3} sx={{ filter: canOpenThisPreview ? "none" : "blur(6px)", pointerEvents: canOpenThisPreview ? "auto" : "none" }}>
+      <Grid container spacing={3}>
         {/* Main Content */}
         <Grid item xs={12} md={8}>
           {donation.images && donation.images.length > 0 && (

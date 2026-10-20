@@ -56,9 +56,13 @@ api.interceptors.response.use(
     }
 
     // Don't auto-retry for auth endpoints (login, register, etc.)
-    const isAuthEndpoint = originalRequest.url?.includes('/auth/login') || 
-                          originalRequest.url?.includes('/auth/register') ||
-                          originalRequest.url?.includes('/auth/refresh');
+    const isAuthEndpoint =
+      originalRequest.url?.includes("/auth/login") ||
+      originalRequest.url?.includes("/auth/register") ||
+      originalRequest.url?.includes("/auth/refresh") ||
+      originalRequest.url?.includes("/auth/forgot-password") ||
+      originalRequest.url?.includes("/auth/reset-password") ||
+      originalRequest.url?.includes("/auth/verify");
 
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       const { refreshToken } = useAuthStore.getState();

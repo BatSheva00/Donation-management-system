@@ -177,29 +177,68 @@ async function sendViaBrevo(
   }
 }
 
+async function postMailWebhook(
+  url: string,
+  body: string,
+  secret: string
+): Promise<Response> {
+  return fetch(url, {
+    method: "POST",
+    redirect: "manual",
+    headers: {
+      "Content-Type": "application/json",
+      ...(secret ? { "X-Mail-Secret": secret } : {}),
+    },
+    body,
+  });
+}
+
 async function sendViaMailWebhook(
   to: string,
   subject: string,
   html: string,
   text: string
 ): Promise<void> {
-  const response = await fetch(process.env.MAIL_WEBHOOK_URL!.trim(), {
-    method: "POST",
-    redirect: "follow",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      secret: process.env.MAIL_WEBHOOK_SECRET || "",
-      to,
-      subject,
-      html,
-      text,
-      from: fromAddress(),
-    }),
+  const url = process.env.MAIL_WEBHOOK_URL!.trim();
+  const secret = process.env.MAIL_WEBHOOK_SECRET?.trim() || "";
+  if (!secret) {
+    throw new Error("MAIL_WEBHOOK_SECRET is missing");
+  }
+
+  const payload = JSON.stringify({
+    secret,
+    to,
+    subject,
+    html,
+    text,
+    from: fromAddress(),
   });
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Mail webhook failed (${response.status}): ${body}`);
+  let currentUrl = url;
+  let response: Response | null = null;
+  for (let hop = 0; hop < 5; hop += 1) {
+    response = await postMailWebhook(currentUrl, payload, secret);
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get("location");
+      if (!location) {
+        throw new Error(`Mail webhook redirect without Location (${response.status})`);
+      }
+      currentUrl = location;
+      continue;
+    }
+    break;
+  }
+
+  if (!response) {
+    throw new Error("Mail webhook did not return a response");
+  }
+
+  const body = await response.text();
+  const looksUnauthorized = /unauthori[sz]ed|forbidden|invalid secret/i.test(body);
+  if (!response.ok || looksUnauthorized) {
+    throw new Error(
+      `Mail webhook failed (${response.status}): ${body.slice(0, 400)}`
+    );
   }
 }
 

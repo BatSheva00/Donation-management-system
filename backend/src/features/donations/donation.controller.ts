@@ -29,10 +29,6 @@ import {
   isGuestRequest,
   sanitizeDonationForGuest,
 } from "./donation.public";
-import {
-  readGuestPreviewId,
-  setGuestPreviewCookie,
-} from "../../shared/utils/cookies";
 
 /**
  * Get all donations with filtering and pagination
@@ -69,7 +65,10 @@ export const getAllDonations = async (
     if (city) filter["pickupLocation.city"] = { $regex: city, $options: "i" };
 
     if (guest) {
-      filter.status = { $in: GUEST_VISIBLE_STATUSES };
+      if (status) {
+        const allowed = GUEST_VISIBLE_STATUSES.includes(status as DonationStatus);
+        filter.status = allowed ? status : { $in: [] };
+      }
     } else {
       if (requestedByMe === "true") {
         filter.requestedBy = req.user?.userId;
@@ -155,21 +154,6 @@ export const getDonationById = async (
       !GUEST_VISIBLE_STATUSES.includes(donation.status as DonationStatus)
     ) {
       return next(new AppError("Donation not found", 404));
-    }
-
-    if (isGuestRequest(req)) {
-      const claimed = readGuestPreviewId(req);
-      const donationId = donation._id.toString();
-      if (!claimed) {
-        setGuestPreviewCookie(res, donationId);
-      } else if (claimed !== donationId) {
-        return next(
-          new AppError(
-            "Guest preview limit reached. Register to continue.",
-            403
-          )
-        );
-      }
     }
 
     // Prevent caching to ensure fresh data

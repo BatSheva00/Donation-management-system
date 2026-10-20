@@ -142,7 +142,7 @@ function App() {
             <Route path="profile/:userId" element={<UserProfilePage />} />
           </Route>
 
-          {/* Donations - guests may browse a limited public preview */}
+          {/* Donations - guests may browse all public listings */}
           <Route
             element={
               <PermissionGuard
@@ -156,12 +156,13 @@ function App() {
             <Route path="donations/:id" element={<DonationDetailPage />} />
           </Route>
 
-          {/* Requests - Permission Protected */}
+          {/* Requests - guests may browse public listings */}
           <Route
             element={
               <PermissionGuard
                 requiredPermissions={["requests.view", "requests.view.own"]}
                 requireAll={false}
+                allowGuest
               />
             }
           >

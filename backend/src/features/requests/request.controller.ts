@@ -6,6 +6,10 @@ import {
   sendRequestStatusNotification,
 } from "./request.notifications";
 import { onRequestCreated, onRequestUpdate } from "../../services/StatsService";
+import {
+  isGuestRequest,
+  sanitizeRequestForGuest,
+} from "./request.public";
 
 // Create a new request
 export const createRequest = async (
@@ -124,10 +128,15 @@ export const getRequests = async (
       .lean();
 
     const total = await RequestModel.countDocuments(query);
+    const payload = isGuestRequest(req)
+      ? requests.map((item) =>
+          sanitizeRequestForGuest(item as Record<string, unknown>)
+        )
+      : requests;
 
     res.json({
       success: true,
-      data: requests,
+      data: payload,
       pagination: {
         page: Number(page),
         limit: Number(limit),
@@ -336,9 +345,13 @@ export const getRequestById = async (
       });
     }
 
+    const data = isGuestRequest(req)
+      ? sanitizeRequestForGuest(request as Record<string, unknown>)
+      : request;
+
     res.json({
       success: true,
-      data: request,
+      data,
     });
   } catch (error: any) {
     res.status(400).json({

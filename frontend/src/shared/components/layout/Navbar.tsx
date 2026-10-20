@@ -355,6 +355,20 @@ const Navbar = () => {
                   </Button>
                   <Button
                     component={Link}
+                    to="/requests"
+                    sx={{
+                      color: isActive("/requests")
+                        ? "primary.main"
+                        : "text.primary",
+                      fontWeight: isActive("/requests") ? 600 : 500,
+                      display: { xs: "none", md: "flex" },
+                      "&:hover": { bgcolor: alpha("#359364", 0.08) },
+                    }}
+                  >
+                    {t("nav.requests")}
+                  </Button>
+                  <Button
+                    component={Link}
                     to="/login"
                     sx={{
                       color: "text.primary",

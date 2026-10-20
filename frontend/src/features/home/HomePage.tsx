@@ -1,4 +1,4 @@
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import {
   Favorite,
@@ -17,6 +17,7 @@ import { formatNumberCompact } from "../../shared/utils/formatNumber";
 import {
   HeroSection,
   StatsSection,
+  FeaturedDonationsSection,
   FeaturesSection,
   CategoriesSection,
   WhyChooseUsSection,
@@ -112,6 +113,7 @@ const HomePage = () => {
     <Box>
       <HeroSection isAuthenticated={isAuthenticated} t={t} />
       <StatsSection stats={stats} />
+      <FeaturedDonationsSection />
       <FeaturesSection features={features} t={t} />
       <CategoriesSection categories={categories} t={t} />
       <WhyChooseUsSection items={whyItems} t={t} />
