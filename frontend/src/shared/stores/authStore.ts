@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { disconnectWebSocket } from "../../hooks/useWebSocket";
 import { getSafeStorage } from "../utils/safeStorage";
 
 interface Role {
@@ -80,9 +79,6 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user }),
       setPermissions: (permissions) => set({ permissions }),
       clearAuth: () => {
-        // Disconnect WebSocket before clearing auth
-        disconnectWebSocket();
-        
         set({
           user: null,
           accessToken: null,
@@ -92,11 +88,11 @@ export const useAuthStore = create<AuthState>()(
         });
       },
       hasPermission: (...requiredPermissions) => {
-        const { permissions } = get();
+        const permissions = get().permissions || [];
         return requiredPermissions.some((perm) => permissions.includes(perm));
       },
       hasAllPermissions: (...requiredPermissions) => {
-        const { permissions } = get();
+        const permissions = get().permissions || [];
         return requiredPermissions.every((perm) => permissions.includes(perm));
       },
     }),
@@ -104,13 +100,28 @@ export const useAuthStore = create<AuthState>()(
       name: "auth-storage",
       storage: createJSONStorage(() => getSafeStorage()),
       partialize: (state) => ({
-        // Persist tokens, user data, and permissions
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
         user: state.user,
         permissions: state.permissions,
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = (persistedState || {}) as Partial<AuthState>;
+        const user =
+          persisted.user && typeof persisted.user === "object"
+            ? persisted.user
+            : null;
+        return {
+          ...currentState,
+          ...persisted,
+          user,
+          permissions: Array.isArray(persisted.permissions)
+            ? persisted.permissions
+            : [],
+          isAuthenticated: Boolean(persisted.isAuthenticated && user),
+        };
+      },
     }
   )
 );

@@ -22,6 +22,8 @@ class ErrorBoundary extends Component<Props, State> {
   handleReload = () => {
     try {
       window.localStorage.removeItem("language");
+      window.localStorage.removeItem("auth-storage");
+      window.localStorage.removeItem("kindloop_guest_preview_id");
     } catch {
       // ignore
     }

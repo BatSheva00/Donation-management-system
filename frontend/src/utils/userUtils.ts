@@ -42,8 +42,8 @@ export const getProfileImageUrl = (user: any): string | null => {
 export const getUserInitials = (user: any): string => {
   if (!user) return "";
 
-  const firstName = user.firstName || "";
-  const lastName = user.lastName || "";
+  const firstName = String(user.firstName || "");
+  const lastName = String(user.lastName || "");
 
   if (firstName && lastName) {
     return `${firstName[0]}${lastName[0]}`.toUpperCase();
@@ -54,7 +54,7 @@ export const getUserInitials = (user: any): string => {
   }
 
   if (user.email) {
-    return user.email.substring(0, 2).toUpperCase();
+    return String(user.email).substring(0, 2).toUpperCase();
   }
 
   return "?";

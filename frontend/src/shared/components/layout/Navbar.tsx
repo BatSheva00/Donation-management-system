@@ -31,7 +31,7 @@ import { usePermission } from "../../hooks/usePermission";
 import { getProfileImageUrl, getUserInitials, isUserVerified } from "../../../utils/userUtils";
 import { NotificationCenter } from "../../../features/notifications/NotificationCenter";
 import UserAvatar from "../shared/UserAvatar";
-import { useWebSocket } from "../../../hooks/useWebSocket";
+import { disconnectWebSocket, useWebSocket } from "../../../hooks/useWebSocket";
 import { DonateButton } from "../../../features/payments/components/DonateButton";
 
 const Navbar = () => {
@@ -39,6 +39,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, user, clearAuth, hasPermission } = useAuthStore();
+  const signedIn = Boolean(isAuthenticated && user);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [langAnchorEl, setLangAnchorEl] = useState<null | HTMLElement>(null);
   
@@ -78,6 +79,7 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
+    disconnectWebSocket();
     clearAuth();
     handleClose();
     navigate("/");
@@ -149,7 +151,7 @@ const Navbar = () => {
             <Box sx={{ flexGrow: 1 }} />
 
             <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-              {isAuthenticated ? (
+              {signedIn ? (
                 <>
                   <Button
                     component={Link}
