@@ -5,3 +5,4 @@ export { BusinessInfoSection } from "./BusinessInfoSection";
 export { DriverInfoSection } from "./DriverInfoSection";
 export { DocumentsSection } from "./DocumentsSection";
 export { DonorRatingSection } from "./DonorRatingSection";
+export { ChangePasswordSection } from "./ChangePasswordSection";

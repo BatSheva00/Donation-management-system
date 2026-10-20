@@ -495,6 +495,13 @@ const resources = {
         basedOnRatings: "Based on {{count}} ratings",
         donorRatingDescription:
           "This rating reflects feedback from drivers about donation quality and accuracy.",
+        changePassword: "Change password",
+        changePasswordHint:
+          "Enter your current password and choose a new one. This only changes your account password.",
+        currentPassword: "Current password",
+        updatePassword: "Update password",
+        passwordChanged: "Password updated successfully",
+        passwordChangeFailed: "Could not update password",
       },
       ratings: {
         rateDriver: "Rate Driver",
@@ -581,6 +588,20 @@ const resources = {
         passwordResetSuccess: "Password updated. You can sign in now.",
         invalidResetLink: "This reset link is invalid or has expired.",
         backToLogin: "Back to sign in",
+        continueAsGuest: "Continue without registering",
+        currentPassword: "Current password",
+        changePassword: "Change password",
+        passwordsMustMatch: "Passwords must match",
+      },
+      guest: {
+        banner:
+          "You are browsing as a guest. You can open one donation. Register to request, share, or download.",
+        limitTitle: "Register to keep browsing",
+        limitBody:
+          "Guests can preview a single donation. Create a free account to request items, contact donors, and see more listings.",
+        preview: "Guest preview",
+        registerToContinue: "Create a free account",
+        noDownload: "Download and sharing are available after you register.",
       },
       home: {
         hero: {
@@ -589,6 +610,7 @@ const resources = {
             "Connecting donors with those in need, one donation at a time. Join our community of kindness.",
           cta1: "Get Started Free",
           cta2: "Browse Donations",
+          ctaGuest: "Continue without registering",
           badge: "Making a Difference Together",
         },
         howItWorks: "How It Works",
@@ -1501,6 +1523,13 @@ const resources = {
         basedOnRatings: "מבוסס על {{count}} דירוגים",
         donorRatingDescription:
           "דירוג זה משקף משוב מנהגים לגבי איכות ודיוק התרומה.",
+        changePassword: "החלפת סיסמה",
+        changePasswordHint:
+          "הזיני את הסיסמה הנוכחית ובחרי סיסמה חדשה. זה משנה רק את סיסמת החשבון שלך.",
+        currentPassword: "סיסמה נוכחית",
+        updatePassword: "עדכון סיסמה",
+        passwordChanged: "הסיסמה עודכנה בהצלחה",
+        passwordChangeFailed: "לא ניתן היה לעדכן את הסיסמה",
       },
       ratings: {
         rateDriver: "דרג נהג",
@@ -1585,6 +1614,20 @@ const resources = {
         passwordResetSuccess: "הסיסמה עודכנה. אפשר להתחבר עכשיו.",
         invalidResetLink: "קישור האיפוס לא תקין או שפג תוקפו.",
         backToLogin: "חזרה להתחברות",
+        continueAsGuest: "המשך בלי להירשם",
+        currentPassword: "סיסמה נוכחית",
+        changePassword: "החלפת סיסמה",
+        passwordsMustMatch: "הסיסמאות חייבות להיות זהות",
+      },
+      guest: {
+        banner:
+          "את צופה כאורחת. אפשר לפתוח תרומה אחת. כדי לבקש, לשתף או להוריד צריך להירשם.",
+        limitTitle: "כדי להמשיך צריך להירשם",
+        limitBody:
+          "אורחים יכולים לראות תרומה אחת במלואה. פתחי חשבון חינם כדי לבקש פריטים, ליצור קשר עם תורמים ולראות עוד מודעות.",
+        preview: "תצוגת אורח",
+        registerToContinue: "יצירת חשבון חינם",
+        noDownload: "הורדה ושיתוף זמינים רק אחרי הרשמה.",
       },
       home: {
         hero: {
@@ -1593,6 +1636,7 @@ const resources = {
             "מקשרים בין תורמים לנזקקים. עושים את ההבדל, תרומה אחת בכל פעם.",
           cta1: "התחל בחינם",
           cta2: "עיין בתרומות",
+          ctaGuest: "המשך בלי להירשם",
           badge: "יוצרים שינוי ביחד",
         },
         howItWorks: "איך זה עובד",

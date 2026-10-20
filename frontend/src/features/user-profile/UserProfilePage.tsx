@@ -22,6 +22,7 @@ import {
   DriverInfoSection,
   DocumentsSection,
   DonorRatingSection,
+  ChangePasswordSection,
 } from "./components";
 
 const UserProfilePage = () => {
@@ -171,6 +172,12 @@ const UserProfilePage = () => {
                 donorRating={userData.donorRating}
                 donorRatingCount={userData.donorRatingCount || 0}
               />
+            </Box>
+          )}
+
+          {isOwnProfile && (
+            <Box sx={{ mb: 3 }}>
+              <ChangePasswordSection />
             </Box>
           )}
         </Grid>

@@ -142,12 +142,13 @@ function App() {
             <Route path="profile/:userId" element={<UserProfilePage />} />
           </Route>
 
-          {/* Donations - Permission Protected */}
+          {/* Donations - guests may browse a limited public preview */}
           <Route
             element={
               <PermissionGuard
                 requiredPermissions={["donations.view", "donations.view.own"]}
                 requireAll={false}
+                allowGuest
               />
             }
           >
@@ -181,20 +182,16 @@ function App() {
             <Route path="my-deliveries" element={<MyDeliveriesPage />} />
           </Route>
 
-          {/* My Donations */}
-          <Route path="my-donations" element={<MyDonationsPage />} />
-
-          {/* My Requests (donation requests by user) */}
-          <Route path="my-requests" element={<MyRequestsPage />} />
-          
-          {/* My User Requests (items requested by user) */}
-          <Route path="my-user-requests" element={<MyRequestsPendingPage />} />
-
-          {/* My Fulfilled Requests (items user has fulfilled/donated to) */}
-          <Route path="my-fulfilled-requests" element={<MyFulfilledRequestsPage />} />
-
-          {/* Notifications */}
-          <Route path="notifications" element={<NotificationsPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="my-donations" element={<MyDonationsPage />} />
+            <Route path="my-requests" element={<MyRequestsPage />} />
+            <Route path="my-user-requests" element={<MyRequestsPendingPage />} />
+            <Route
+              path="my-fulfilled-requests"
+              element={<MyFulfilledRequestsPage />}
+            />
+            <Route path="notifications" element={<NotificationsPage />} />
+          </Route>
 
           {/* Admin Routes - Protected by Permission */}
           <Route

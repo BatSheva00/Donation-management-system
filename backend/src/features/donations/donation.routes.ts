@@ -1,121 +1,108 @@
-import { Router } from 'express';
-import { authenticate, authorize } from '../../shared/middleware/auth.middleware';
-import { validate } from '../../shared/middleware/validate.middleware';
-import * as donationController from './donation.controller';
+import { Router } from "express";
+import {
+  authenticate,
+  authorize,
+  optionalAuthenticate,
+} from "../../shared/middleware/auth.middleware";
+import { validate } from "../../shared/middleware/validate.middleware";
+import * as donationController from "./donation.controller";
 import {
   createDonationValidation,
   updateDonationValidation,
   updateDonationStatusValidation,
-} from './donation.validation';
+} from "./donation.validation";
 
 const router = Router();
 
-// All routes require authentication
-router.use(authenticate);
+router.get("/", optionalAuthenticate, donationController.getAllDonations);
+router.get("/stats", authenticate, donationController.getDonationStats);
+router.get("/my-donations", authenticate, donationController.getMyDonations);
+router.get("/:id", optionalAuthenticate, donationController.getDonationById);
 
-// Get all donations with filtering
-router.get('/', donationController.getAllDonations);
-
-// Get donation statistics
-router.get('/stats', donationController.getDonationStats);
-
-// Get my donations (authenticated user's donations)
-router.get('/my-donations', donationController.getMyDonations);
-
-// Create a new donation (user, business, or admin)
 router.post(
-  '/',
-  authorize('business', 'user', 'admin'),
+  "/",
+  authenticate,
+  authorize("business", "user", "admin"),
   validate(createDonationValidation),
   donationController.createDonation
 );
 
-// Get donation by ID
-router.get('/:id', donationController.getDonationById);
-
-// Update donation (donor or admin only)
 router.put(
-  '/:id',
+  "/:id",
+  authenticate,
   validate(updateDonationValidation),
   donationController.updateDonation
 );
 
-// Delete donation (donor or admin only)
-router.delete('/:id', donationController.deleteDonation);
+router.delete("/:id", authenticate, donationController.deleteDonation);
 
-// Update donation status (admin or driver only)
 router.patch(
-  '/:id/status',
-  authorize('admin', 'driver'),
+  "/:id/status",
+  authenticate,
+  authorize("admin", "driver"),
   validate(updateDonationStatusValidation),
   donationController.updateDonationStatus
 );
 
-// Request a donation (authenticated users)
 router.post(
-  '/:id/request',
-  authorize('user', 'business'),
+  "/:id/request",
+  authenticate,
+  authorize("user", "business"),
   donationController.requestDonation
 );
 
-// Approve a donation request (admin or donor)
 router.patch(
-  '/:id/approve',
+  "/:id/approve",
+  authenticate,
   donationController.approveRequest
 );
 
-// Reject a donation request (admin only)
 router.patch(
-  '/:id/reject',
-  authorize('admin'),
+  "/:id/reject",
+  authenticate,
+  authorize("admin"),
   donationController.rejectRequest
 );
 
-// Driver self-assignment (driver only)
 router.post(
-  '/:id/assign-driver',
-  authorize('driver'),
+  "/:id/assign-driver",
+  authenticate,
+  authorize("driver"),
   donationController.assignDriverSelf
 );
 
-// Driver marks donation as in transit (driver only, must be assigned)
 router.patch(
-  '/:id/mark-in-transit',
-  authorize('driver'),
+  "/:id/mark-in-transit",
+  authenticate,
+  authorize("driver"),
   donationController.markInTransit
 );
 
-// Driver marks donation as delivered (driver only, must be assigned)
 router.patch(
-  '/:id/mark-delivered',
-  authorize('driver'),
+  "/:id/mark-delivered",
+  authenticate,
+  authorize("driver"),
   donationController.markDelivered
 );
 
-// User marks donation as completed (requester only)
 router.patch(
-  '/:id/mark-completed',
+  "/:id/mark-completed",
+  authenticate,
   donationController.markCompleted
 );
 
-// User unassigns themselves from a donation (requester only)
 router.patch(
-  '/:id/unassign-request',
-  authorize('user', 'business'),
+  "/:id/unassign-request",
+  authenticate,
+  authorize("user", "business"),
   donationController.unassignRequest
 );
 
-// Driver unassigns themselves from a delivery (driver only)
 router.patch(
-  '/:id/unassign-driver',
-  authorize('driver'),
+  "/:id/unassign-driver",
+  authenticate,
+  authorize("driver"),
   donationController.unassignDriver
 );
 
 export default router;
-
-
-
-
-
-

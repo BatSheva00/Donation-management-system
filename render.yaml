@@ -19,6 +19,10 @@ services:
         value: 15m
       - key: JWT_REFRESH_EXPIRE
         value: 7d
+      - key: FRONTEND_URL
+        value: https://kindloop-one.vercel.app
+      - key: CORS_ORIGINS
+        sync: false
       - key: MONGO_ATLAS_USER
         sync: false
       - key: MONGO_ATLAS_PASSWORD
@@ -27,17 +31,29 @@ services:
         sync: false
       - key: MONGO_ATLAS_DB
         value: kindloop
-      - key: SMTP_HOST
-        value: smtp.gmail.com
-      - key: SMTP_PORT
-        value: "587"
-      - key: SMTP_USER
-        sync: false
-      - key: SMTP_PASS
-        sync: false
       - key: EMAIL_FROM
         sync: false
-      - key: FRONTEND_URL
+      - key: MAIL_WEBHOOK_URL
         sync: false
-      - key: CORS_ORIGINS
+      - key: MAIL_WEBHOOK_SECRET
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: ADMIN_SEED_EMAIL
+        sync: false
+      - key: ADMIN_SEED_PASSWORD
+        sync: false
+      - key: AI_MICROSERVICE_URL
         sync: false

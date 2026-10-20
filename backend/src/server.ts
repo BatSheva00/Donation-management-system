@@ -17,6 +17,12 @@ import { initializeSocketIO } from "./config/socket";
 import { runSeeds } from "./config/seedPermissions";
 import { initializeNotificationService } from "./services/NotificationService";
 import { getCorsOriginOption } from "./config/corsOrigins";
+import { apiLimiter } from "./shared/middleware/rateLimit.middleware";
+import { handleStripeWebhook } from "./features/payments/payment.controller";
+import {
+  isEmailConfigured,
+} from "./services/email.service";
+import { isCloudinaryConfigured } from "./services/storage.service";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -36,6 +42,11 @@ app.use(
   })
 );
 app.use(compression());
+app.post(
+  "/api/payments/webhook",
+  express.raw({ type: "application/json" }),
+  handleStripeWebhook
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -45,7 +56,21 @@ app.use(
 );
 
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
+  const production = process.env.NODE_ENV === "production";
+  res.status(200).json({
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    mail: isEmailConfigured(),
+    httpsMail: Boolean(
+      process.env.RESEND_API_KEY?.trim() ||
+        process.env.BREVO_API_KEY?.trim() ||
+        process.env.MAIL_WEBHOOK_URL?.trim()
+    ),
+    uploads: production ? isCloudinaryConfigured() : true,
+    stripe: Boolean(process.env.STRIPE_SECRET_KEY?.trim()),
+    stripeWebhook: Boolean(process.env.STRIPE_WEBHOOK_SECRET?.trim()),
+    ai: Boolean(process.env.AI_MICROSERVICE_URL?.trim()),
+  });
 });
 
 app.use(
@@ -54,13 +79,19 @@ app.use(
     origin: getCorsOriginOption(),
     credentials: true,
   }),
-  express.static(path.join(__dirname, "../uploads/profile-images"), {
+  express.static(path.join(process.cwd(), "uploads/profile-images"), {
     setHeaders: (res) => {
       res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     },
   })
 );
 
+app.use("/api", (req, res, next) => {
+  if (req.path === "/payments/webhook") {
+    return next();
+  }
+  return apiLimiter(req, res, next);
+});
 app.use("/api", routes);
 
 initializeSocketIO(io);

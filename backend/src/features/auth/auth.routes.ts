@@ -18,7 +18,7 @@ router.post(
     body("lastName").trim().notEmpty(),
     body("phone.countryCode").trim().notEmpty(),
     body("phone.number").trim().notEmpty(),
-    body("role").optional().isIn(["user", "business", "driver"]),
+    body("roleKey").optional().isIn(["user", "business", "driver"]),
   ]),
   authController.register
 );
@@ -77,6 +77,17 @@ router.post(
   authLimiter,
   validate([body("password").isLength({ min: 8 })]),
   authController.resetPassword
+);
+
+router.post(
+  "/change-password",
+  authenticate,
+  authLimiter,
+  validate([
+    body("currentPassword").notEmpty(),
+    body("newPassword").isLength({ min: 8 }),
+  ]),
+  authController.changePassword
 );
 
 // Get current user

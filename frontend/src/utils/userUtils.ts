@@ -3,21 +3,35 @@
  * @param user User object with profileImage field
  * @returns Profile image URL or null if not found
  */
+export const resolveMediaUrl = (path?: string | null): string | null => {
+  if (!path) {
+    return null;
+  }
+
+  if (
+    path.startsWith("http://") ||
+    path.startsWith("https://") ||
+    path.startsWith("data:") ||
+    path.startsWith("blob:")
+  ) {
+    return path;
+  }
+
+  if (path.startsWith("/")) {
+    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const cleanBaseUrl = baseUrl.replace(/\/api\/?$/, "");
+    return `${cleanBaseUrl}${path}`;
+  }
+
+  return path;
+};
+
 export const getProfileImageUrl = (user: any): string | null => {
   if (!user || !user.profileImage) {
     return null;
   }
 
-  // If path starts with /, it's relative to the backend server (but NOT under /api)
-  if (user.profileImage.startsWith("/")) {
-    // Get base URL without /api suffix
-    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
-    // Remove /api if it exists at the end
-    const cleanBaseUrl = baseUrl.replace(/\/api\/?$/, "");
-    return `${cleanBaseUrl}${user.profileImage}`;
-  }
-  
-  return user.profileImage;
+  return resolveMediaUrl(user.profileImage);
 };
 
 /**

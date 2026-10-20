@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import Stripe from "stripe";
 import { getStripe } from "../../config/stripe";
 import {
   Transaction,
@@ -8,6 +9,69 @@ import {
 import { SystemBalance } from "./systemBalance.model";
 import { AppError } from "../../shared/utils/AppError";
 import { calculateStripeFees } from "../../shared/utils/stripe.utils";
+import { logger } from "../../config/logger";
+
+async function persistSuccessfulDonation(paymentIntent: Stripe.PaymentIntent) {
+  const userId = paymentIntent.metadata?.userId;
+  if (!userId) {
+    throw new AppError("Payment is missing user metadata", 400);
+  }
+
+  const existingTransaction = await Transaction.findOne({
+    stripePaymentIntentId: paymentIntent.id,
+    status: TransactionStatus.COMPLETED,
+  });
+
+  if (existingTransaction) {
+    const systemBalance = await SystemBalance.findOne({ currency: "USD" });
+    return {
+      transaction: existingTransaction,
+      systemBalance,
+      alreadyProcessed: true,
+    };
+  }
+
+  const grossAmount = paymentIntent.amount / 100;
+  const { fee, netAmount } = calculateStripeFees(grossAmount);
+
+  const transaction = await Transaction.create({
+    userId,
+    type: TransactionType.DONATION,
+    amount: grossAmount,
+    fee,
+    netAmount,
+    currency: "USD",
+    status: TransactionStatus.COMPLETED,
+    description: `Donated $${grossAmount.toFixed(
+      2
+    )} to KindLoop (Fee: $${fee.toFixed(2)}, Net: $${netAmount.toFixed(2)})`,
+    stripePaymentIntentId: paymentIntent.id,
+    stripeChargeId: paymentIntent.latest_charge as string,
+  });
+
+  let systemBalance = await SystemBalance.findOne({
+    currency: "USD",
+  });
+
+  if (!systemBalance) {
+    systemBalance = await SystemBalance.create({
+      totalBalance: netAmount,
+      currency: "USD",
+      totalDeposits: grossAmount,
+      totalDonations: grossAmount,
+      totalFees: fee,
+    });
+  } else {
+    systemBalance.totalBalance += netAmount;
+    systemBalance.totalDeposits += grossAmount;
+    systemBalance.totalDonations += grossAmount;
+    systemBalance.totalFees += fee;
+    systemBalance.lastUpdated = new Date();
+    await systemBalance.save();
+  }
+
+  return { transaction, systemBalance, alreadyProcessed: false };
+}
 
 /**
  * Create Stripe Payment Intent for donation
@@ -77,66 +141,18 @@ export const confirmDonation = async (
       return next(new AppError("Payment not succeeded", 400));
     }
 
-    // Check if already processed
-    const existingTransaction = await Transaction.findOne({
-      stripePaymentIntentId: paymentIntentId,
-      status: TransactionStatus.COMPLETED,
-    });
-
-    if (existingTransaction) {
-      return res.status(200).json({
-        success: true,
-        message: "Donation already processed",
-        data: existingTransaction,
-      });
+    if (paymentIntent.metadata?.userId !== userId) {
+      return next(new AppError("Payment does not belong to this user", 403));
     }
 
-    const grossAmount = paymentIntent.amount / 100; // Convert cents to dollars
-
-    // Calculate Stripe fees
-    const { fee, netAmount } = calculateStripeFees(grossAmount);
-
-    // Create transaction record
-    const transaction = await Transaction.create({
-      userId,
-      type: TransactionType.DONATION,
-      amount: grossAmount,
-      fee,
-      netAmount,
-      currency: "USD",
-      status: TransactionStatus.COMPLETED,
-      description: `Donated $${grossAmount.toFixed(
-        2
-      )} to KindLoop (Fee: $${fee.toFixed(2)}, Net: $${netAmount.toFixed(2)})`,
-      stripePaymentIntentId: paymentIntentId,
-      stripeChargeId: paymentIntent.latest_charge as string,
-    });
-
-    // Update system balance with NET amounts
-    let systemBalance = await SystemBalance.findOne({
-      currency: "USD",
-    });
-
-    if (!systemBalance) {
-      systemBalance = await SystemBalance.create({
-        totalBalance: netAmount,
-        currency: "USD",
-        totalDeposits: grossAmount,
-        totalDonations: grossAmount,
-        totalFees: fee,
-      });
-    } else {
-      systemBalance.totalBalance += netAmount; // Add NET amount to balance
-      systemBalance.totalDeposits += grossAmount; // Track gross deposits
-      systemBalance.totalDonations += grossAmount; // Track gross donations
-      systemBalance.totalFees += fee; // Track total fees paid
-      systemBalance.lastUpdated = new Date();
-      await systemBalance.save();
-    }
+    const { transaction, systemBalance, alreadyProcessed } =
+      await persistSuccessfulDonation(paymentIntent);
 
     res.status(200).json({
       success: true,
-      message: "Thank you for your donation!",
+      message: alreadyProcessed
+        ? "Donation already processed"
+        : "Thank you for your donation!",
       data: {
         transaction,
         systemTotalBalance: systemBalance?.totalBalance || 0,
@@ -392,6 +408,41 @@ export const getSystemBalance = async (
       },
     });
   } catch (error) {
+    next(error);
+  }
+};
+
+export const handleStripeWebhook = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const secret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
+    if (!secret) {
+      throw new AppError("Stripe webhook is not configured", 503);
+    }
+
+    const signature = req.headers["stripe-signature"];
+    if (!signature || typeof signature !== "string") {
+      throw new AppError("Missing Stripe signature", 400);
+    }
+
+    const event = getStripe().webhooks.constructEvent(
+      req.body,
+      signature,
+      secret
+    );
+
+    if (event.type === "payment_intent.succeeded") {
+      await persistSuccessfulDonation(
+        event.data.object as Stripe.PaymentIntent
+      );
+    }
+
+    res.status(200).json({ received: true });
+  } catch (error) {
+    logger.error("Stripe webhook failed", error);
     next(error);
   }
 };

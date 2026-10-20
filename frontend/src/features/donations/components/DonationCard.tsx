@@ -19,7 +19,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Donation } from "../types/donation.types";
-import { getProfileImageUrl, getUserInitials, isUserVerified } from "../../../utils/userUtils";
+import { getProfileImageUrl, getUserInitials, isUserVerified, resolveMediaUrl } from "../../../utils/userUtils";
 import UserAvatar from "../../../shared/components/shared/UserAvatar";
 
 interface DonationCardProps {
@@ -74,8 +74,10 @@ export const DonationCard = ({ donation }: DonationCardProps) => {
         <CardMedia
           component="img"
           height="200"
-          image={donation.images[0]}
+          image={resolveMediaUrl(donation.images[0]) || undefined}
           alt={donation.title}
+          loading="eager"
+          decoding="async"
         />
       ) : (
         <Box

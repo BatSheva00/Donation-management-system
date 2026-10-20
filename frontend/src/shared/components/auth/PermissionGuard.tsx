@@ -10,6 +10,7 @@ interface PermissionGuardProps {
   requiredPermissions?: string[];
   requireAll?: boolean; // If true, user must have ALL permissions. If false, user needs at least ONE
   fallback?: ReactNode;
+  allowGuest?: boolean;
 }
 
 const PermissionGuard = ({
@@ -17,11 +18,14 @@ const PermissionGuard = ({
   requiredPermissions = [],
   requireAll = false,
   fallback,
+  allowGuest = false,
 }: PermissionGuardProps) => {
   const { isAuthenticated, hasPermission, hasAllPermissions } = useAuthStore();
 
-  // If not authenticated, redirect to login
   if (!isAuthenticated) {
+    if (allowGuest) {
+      return children ? <>{children}</> : <Outlet />;
+    }
     return <Navigate to="/login" replace />;
   }
 

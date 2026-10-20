@@ -27,7 +27,7 @@ export function isEmailConfigured(): boolean {
 }
 
 export function assertEmailReadyForProduction(): void {
-  if (isProduction() && !isEmailConfigured()) {
+  if (isProduction() && !hasHttpsMail()) {
     throw new AppError(
       "Email delivery is not configured. Set RESEND_API_KEY, BREVO_API_KEY, or MAIL_WEBHOOK_URL (Gmail SMTP is blocked on Render).",
       503

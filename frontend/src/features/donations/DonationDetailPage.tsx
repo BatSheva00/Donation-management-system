@@ -43,8 +43,10 @@ import {
 import { useTranslation } from "react-i18next";
 import api from "../../lib/axios";
 import { Donation, DonationStatus } from "./types/donation.types";
-import { getProfileImageUrl, getUserInitials, isUserVerified } from "../../utils/userUtils";
+import { getProfileImageUrl, getUserInitials, isUserVerified, resolveMediaUrl } from "../../utils/userUtils";
 import { useAuthStore } from "../../shared/stores/authStore";
+import { claimGuestPreview } from "../../shared/utils/guestPreview";
+import { aiFeaturesEnabled } from "../../shared/utils/aiFeatures";
 import { DeliveryRequestDialog } from "./components/DeliveryRequestDialog";
 import { DriverStatusButton } from "./components/DriverStatusButton";
 import { CompleteButton } from "./components/CompleteButton";
@@ -58,7 +60,9 @@ const DonationDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { user, hasPermission } = useAuthStore();
+  const { user, hasPermission, isAuthenticated } = useAuthStore();
+  const isGuest = !isAuthenticated;
+  const canOpenThisPreview = !isGuest || !id || claimGuestPreview(id);
   const queryClient = useQueryClient();
   const [translatedDescription, setTranslatedDescription] = useState<
     string | null
@@ -94,7 +98,7 @@ const DonationDetailPage = () => {
 
   // Rating queries and mutations
   const { data: canRateData } = useCanRate(
-    donation?.status === DonationStatus.COMPLETED ? id : undefined
+    !isGuest && donation?.status === DonationStatus.COMPLETED ? id : undefined
   );
   const createRatingMutation = useCreateRating();
 
@@ -330,6 +334,34 @@ const DonationDetailPage = () => {
     );
   }
 
+  const guestLimitReached =
+    isGuest &&
+    (error as { response?: { status?: number } })?.response?.status === 403;
+
+  if (guestLimitReached) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Paper sx={{ p: 4, textAlign: "center" }}>
+          <Typography variant="h5" fontWeight={700} gutterBottom>
+            {t("guest.limitTitle")}
+          </Typography>
+          <Typography color="text.secondary" sx={{ mb: 3 }}>
+            {t("guest.limitBody")}
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={() => navigate("/register")}
+            sx={{
+              background: "linear-gradient(135deg, #359364 0%, #24754f 100%)",
+            }}
+          >
+            {t("guest.registerToContinue")}
+          </Button>
+        </Paper>
+      </Container>
+    );
+  }
+
   if (error || !donation) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -402,7 +434,7 @@ const DonationDetailPage = () => {
           </Box>
 
           {/* Request Button - Show only if donation is PENDING and user is NOT the donor */}
-          {donation.status === DonationStatus.PENDING && 
+          {!isGuest && donation.status === DonationStatus.PENDING && 
            user?.id !== donation.donorId?._id && (
             <Button
               variant="contained"
@@ -501,9 +533,83 @@ const DonationDetailPage = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
+      {isGuest && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          {t("guest.banner")}
+        </Alert>
+      )}
+
+      {!canOpenThisPreview && (
+        <Paper sx={{ p: 4, mb: 3, textAlign: "center" }}>
+          <Typography variant="h5" fontWeight={700} gutterBottom>
+            {t("guest.limitTitle")}
+          </Typography>
+          <Typography color="text.secondary" sx={{ mb: 3 }}>
+            {t("guest.limitBody")}
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={() => navigate("/register")}
+            sx={{
+              background: "linear-gradient(135deg, #359364 0%, #24754f 100%)",
+            }}
+          >
+            {t("guest.registerToContinue")}
+          </Button>
+        </Paper>
+      )}
+
+      <Grid container spacing={3} sx={{ filter: canOpenThisPreview ? "none" : "blur(6px)", pointerEvents: canOpenThisPreview ? "auto" : "none" }}>
         {/* Main Content */}
         <Grid item xs={12} md={8}>
+          {donation.images && donation.images.length > 0 && (
+            <Paper sx={{ p: 1.5, mb: 3, overflow: "hidden" }}>
+              <Box
+                component="img"
+                src={resolveMediaUrl(donation.images[0]) || undefined}
+                alt={donation.title}
+                loading="eager"
+                decoding="async"
+                onContextMenu={isGuest ? (event) => event.preventDefault() : undefined}
+                draggable={!isGuest}
+                sx={{
+                  width: "100%",
+                  maxHeight: 420,
+                  objectFit: "cover",
+                  borderRadius: 2,
+                  userSelect: isGuest ? "none" : "auto",
+                  display: "block",
+                }}
+              />
+              {donation.images.length > 1 && (
+                <Stack direction="row" spacing={1} sx={{ mt: 1, overflowX: "auto" }}>
+                  {donation.images.slice(1).map((src) => (
+                    <Box
+                      key={src}
+                      component="img"
+                      src={resolveMediaUrl(src) || undefined}
+                      alt=""
+                      loading="eager"
+                      onContextMenu={isGuest ? (event) => event.preventDefault() : undefined}
+                      draggable={!isGuest}
+                      sx={{
+                        width: 96,
+                        height: 72,
+                        objectFit: "cover",
+                        borderRadius: 1,
+                        userSelect: "none",
+                      }}
+                    />
+                  ))}
+                </Stack>
+              )}
+              {isGuest && (
+                <Typography variant="caption" color="text.secondary" sx={{ px: 1 }}>
+                  {t("guest.noDownload")}
+                </Typography>
+              )}
+            </Paper>
+          )}
           <Paper sx={{ p: 3, mb: 3 }}>
             <Typography variant="h6" fontWeight={700} gutterBottom>
               {t("donations.description") || "Description"}
@@ -525,6 +631,7 @@ const DonationDetailPage = () => {
             </Typography>
 
             {/* Enhanced Translate and Listen buttons */}
+            {!isGuest && aiFeaturesEnabled && (
             <Box
               sx={{
                 mt: 2.5,
@@ -656,6 +763,7 @@ const DonationDetailPage = () => {
                   : t("donations.listen")}
               </Button>
             </Box>
+            )}
 
             <Divider sx={{ my: 3 }} />
 
@@ -799,13 +907,15 @@ const DonationDetailPage = () => {
               <LocationOn sx={{ verticalAlign: "middle", mr: 1 }} />
               {t("donations.pickupLocation") || "Pickup Location"}
             </Typography>
-            <Typography variant="body1" gutterBottom>
-              {donation.pickupLocation.address}
-            </Typography>
+            {!isGuest && donation.pickupLocation.address && (
+              <Typography variant="body1" gutterBottom>
+                {donation.pickupLocation.address}
+              </Typography>
+            )}
             <Typography variant="body1" color="text.secondary">
               {donation.pickupLocation.city}
             </Typography>
-            {donation.pickupTimeWindow && (
+            {!isGuest && donation.pickupTimeWindow && (
               <Box sx={{ mt: 2 }}>
                 <Typography variant="body2" color="text.secondary">
                   Pickup Time Window:

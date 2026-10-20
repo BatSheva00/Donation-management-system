@@ -153,6 +153,20 @@ const LoginPage = () => {
           </Divider>
 
           <Box sx={{ textAlign: "center" }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+              <MuiLink
+                component={Link}
+                to="/donations"
+                sx={{
+                  color: "primary.main",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+              >
+                {t("auth.continueAsGuest")}
+              </MuiLink>
+            </Typography>
             <Typography variant="body2" color="text.secondary">
               {t("auth.dontHaveAccount")}{" "}
               <MuiLink

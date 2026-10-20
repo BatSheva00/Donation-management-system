@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import crypto from "crypto";
 import { User } from "../users/user.model";
 import { Role } from "../roles/role.model";
 import { AppError } from "../../shared/utils/AppError";
@@ -19,6 +20,10 @@ import {
   sendPasswordResetEmail,
   sendVerificationCodeEmail,
 } from "../../services/email.service";
+
+function hashResetToken(token: string): string {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
 
 export const register = async (
   req: Request,
@@ -71,24 +76,19 @@ export const register = async (
       emailVerificationExpires,
     });
 
-    // Update system stats for new user registration
+    try {
+      await sendVerificationCodeEmail({
+        to: user.email,
+        code: emailVerificationCode,
+        firstName: user.firstName,
+        language: user.language,
+      });
+    } catch (mailError) {
+      await User.findByIdAndDelete(user._id);
+      throw mailError;
+    }
+
     await onUserRegistered(user._id.toString(), roleKeyToUse);
-
-    // Verify it was saved correctly
-    const savedUser = await User.findById(user._id).select(
-      "+emailVerificationCode"
-    );
-    logger.debug(`✅ Verification code saved for ${email}:`, {
-      userId: user._id,
-      storedType: typeof savedUser?.emailVerificationCode,
-    });
-
-    await sendVerificationCodeEmail({
-      to: user.email,
-      code: emailVerificationCode,
-      firstName: user.firstName,
-      language: user.language,
-    });
 
     res.status(201).json({
       success: true,
@@ -407,7 +407,7 @@ export const forgotPassword = async (
     }
 
     const resetToken = uuidv4();
-    user.resetPasswordToken = resetToken;
+    user.resetPasswordToken = hashResetToken(resetToken);
     user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
     await user.save();
 
@@ -436,10 +436,11 @@ export const resetPassword = async (
     const { token } = req.params;
     const { password } = req.body;
 
+    const hashedToken = hashResetToken(token);
     const user = await User.findOne({
-      resetPasswordToken: token,
+      resetPasswordToken: { $in: [hashedToken, token] },
       resetPasswordExpires: { $gt: new Date() },
-    });
+    }).select("+password");
 
     if (!user) {
       throw new AppError("Invalid or expired reset token", 400);
@@ -454,6 +455,57 @@ export const resetPassword = async (
     res.json({
       success: true,
       message: "Password reset successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      throw new AppError("User not authenticated", 401);
+    }
+
+    const { currentPassword, newPassword } = req.body as {
+      currentPassword?: string;
+      newPassword?: string;
+    };
+
+    if (!currentPassword || !newPassword) {
+      throw new AppError("Current password and new password are required", 400);
+    }
+
+    if (newPassword.length < 8) {
+      throw new AppError("Password must be at least 8 characters", 400);
+    }
+
+    if (currentPassword === newPassword) {
+      throw new AppError("New password must be different from the current password", 400);
+    }
+
+    const user = await User.findById(req.user.userId).select("+password");
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    const matches = await comparePassword(currentPassword, user.password);
+    if (!matches) {
+      throw new AppError("Current password is incorrect", 400);
+    }
+
+    user.password = await hashPassword(newPassword);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Password updated successfully",
     });
   } catch (error) {
     next(error);

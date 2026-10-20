@@ -17,6 +17,11 @@ import {
   sendNotificationToRole,
   sendNotificationToUser,
 } from "../notifications/notification.service";
+import {
+  assertUploadsReady,
+  saveJpeg,
+  uploadsRoot,
+} from "../../services/storage.service";
 
 /**
  * Get all users (Admin)
@@ -730,44 +735,36 @@ export const uploadProfileImage = async (
       return next(new AppError("No file uploaded", 400));
     }
 
-    // Create public profile images directory if it doesn't exist
-    const profileImagesDir = path.join(
-      __dirname,
-      "../../../uploads/profile-images"
-    );
-    if (!fs.existsSync(profileImagesDir)) {
-      fs.mkdirSync(profileImagesDir, { recursive: true });
-    }
+    assertUploadsReady();
 
-    // Process image: resize to profile size and optimize
     const processedFilename = `profile-${userId}-${Date.now()}.jpg`;
-    const processedPath = path.join(profileImagesDir, processedFilename);
-
-    await sharp(file.path)
+    const buffer = await sharp(file.path)
       .resize(400, 400, {
         fit: "cover",
         position: "center",
       })
       .jpeg({ quality: 90 })
-      .toFile(processedPath);
+      .toBuffer();
 
-    // Delete original file
     fs.unlinkSync(file.path);
 
-    // Delete old profile image if exists
-    if (user.profileImage) {
-      const oldImagePath = path.join(__dirname, "../../..", user.profileImage);
+    if (user.profileImage?.startsWith("/uploads/")) {
+      const oldImagePath = path.join(uploadsRoot(), user.profileImage.replace(/^\/uploads\//, ""));
       if (fs.existsSync(oldImagePath)) {
         try {
           fs.unlinkSync(oldImagePath);
-        } catch (err) {
-          console.error("Failed to delete old profile image:", err);
+        } catch {
+          // ignore missing old files
         }
       }
     }
 
-    // Save new profile image path (relative to backend root, publicly accessible)
-    user.profileImage = `/uploads/profile-images/${processedFilename}`;
+    user.profileImage = await saveJpeg({
+      buffer,
+      folder: "profile-images",
+      diskDir: "profile-images",
+      filename: processedFilename,
+    });
     await user.save();
 
     res.status(200).json({
@@ -809,37 +806,35 @@ export const uploadDocuments = async (
       return next(new AppError("Document type is required", 400));
     }
 
-    // Create processed images directory if it doesn't exist
-    const processedDir = path.join(
-      __dirname,
-      "../../../uploads/documents/processed"
-    );
-    if (!fs.existsSync(processedDir)) {
-      fs.mkdirSync(processedDir, { recursive: true });
-    }
+    assertUploadsReady();
 
-    // Process and store documents
     const processedDocuments = [];
 
     for (const file of files) {
-      // Process image: resize and optimize
-      const processedFilename = `processed-${file.filename}`;
-      const processedPath = path.join(processedDir, processedFilename);
-
-      await sharp(file.path)
+      const processedFilename = `processed-${file.filename}`.replace(
+        path.extname(file.filename),
+        ".jpg"
+      );
+      const buffer = await sharp(file.path)
         .resize(1200, 1200, {
           fit: "inside",
           withoutEnlargement: true,
         })
         .jpeg({ quality: 85 })
-        .toFile(processedPath);
+        .toBuffer();
 
-      // Delete original file
       fs.unlinkSync(file.path);
+
+      const storedPath = await saveJpeg({
+        buffer,
+        folder: "documents",
+        diskDir: "documents/processed",
+        filename: processedFilename,
+      });
 
       processedDocuments.push({
         type: documentType,
-        path: `/uploads/documents/processed/${processedFilename}`,
+        path: storedPath,
         filename: processedFilename,
         uploadedAt: new Date(),
       });
@@ -1014,14 +1009,19 @@ export const serveDocument = async (
       return next(new AppError("Document not found", 404));
     }
 
-    // Serve the file
+    const stored = user.documents?.find((doc: { filename: string; path: string }) => doc.filename === filename);
+    if (stored?.path?.startsWith("http")) {
+      res.redirect(stored.path);
+      return;
+    }
+
     const filePath = path.join(
-      __dirname,
-      "../../../uploads/documents/processed",
+      uploadsRoot(),
+      "documents",
+      "processed",
       filename
     );
 
-    // Check if file exists
     if (!fs.existsSync(filePath)) {
       return next(new AppError("File not found on server", 404));
     }

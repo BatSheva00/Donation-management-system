@@ -5,7 +5,7 @@ import { Request } from "express";
 import { AppError } from "../utils/AppError";
 
 // Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, "../../../uploads");
+const uploadsDir = path.join(process.cwd(), "uploads");
 const documentsDir = path.join(uploadsDir, "documents");
 
 if (!fs.existsSync(uploadsDir)) {

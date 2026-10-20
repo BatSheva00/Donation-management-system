@@ -58,6 +58,38 @@ export const authenticate = async (
   }
 };
 
+/** Attach user when a valid token is present; otherwise continue as guest. */
+export const optionalAuthenticate = async (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const token = req.headers.authorization?.replace("Bearer ", "");
+  if (!token) {
+    next();
+    return;
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      userId: string;
+      email: string;
+      role: string;
+    };
+    const user = await User.findById(decoded.userId);
+    if (
+      user &&
+      user.status !== UserStatus.SUSPENDED &&
+      user.status !== UserStatus.INACTIVE
+    ) {
+      req.user = decoded;
+    }
+  } catch {
+    // Expired or malformed token — browse as guest
+  }
+  next();
+};
+
 export const authorize = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {

@@ -20,7 +20,7 @@ router.get("/me", authenticate, getUserStats);
 router.get(
   "/user/:userId",
   authenticate,
-  requirePermission("users:read"),
+  requirePermission("users.view"),
   getUserStatsById
 );
 

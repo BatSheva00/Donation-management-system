@@ -39,6 +39,7 @@ import { useTranslation } from "react-i18next";
 import api from "../../lib/axios";
 import { IRequest, RequestStatus } from "./types/request.types";
 import { useAuthStore } from "../../shared/stores/authStore";
+import { aiFeaturesEnabled } from "../../shared/utils/aiFeatures";
 import UserAvatar from "../../shared/components/shared/UserAvatar";
 import {
   useFulfillRequest,
@@ -355,6 +356,7 @@ const RequestDetailPage = () => {
                 <Typography variant="h6" fontWeight={600}>
                   {t("requests.description") || "Description"}
                 </Typography>
+                {aiFeaturesEnabled && (
                 <Stack direction="row" spacing={1}>
                   <Button
                     size="small"
@@ -383,6 +385,7 @@ const RequestDetailPage = () => {
                     </Button>
                   )}
                 </Stack>
+                )}
               </Box>
               <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
                 {translatedDescription || request.description}

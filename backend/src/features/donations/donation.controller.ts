@@ -23,6 +23,16 @@ import {
 } from "../../services/StatsService";
 import { sendNotificationToRole } from "../notifications/notification.service";
 import { notifyDonationStatusChange } from "./donation.notifications";
+import {
+  GUEST_VISIBLE_STATUSES,
+  guestListPopulate,
+  isGuestRequest,
+  sanitizeDonationForGuest,
+} from "./donation.public";
+import {
+  readGuestPreviewId,
+  setGuestPreviewCookie,
+} from "../../shared/utils/cookies";
 
 /**
  * Get all donations with filtering and pagination
@@ -49,6 +59,7 @@ export const getAllDonations = async (
     } = req.query;
 
     const filter: any = {};
+    const guest = isGuestRequest(req);
 
     // Apply filters
     if (status) filter.status = status;
@@ -56,15 +67,16 @@ export const getAllDonations = async (
     if (donorId) filter.donorId = donorId;
     if (isFood !== undefined) filter.isFood = isFood === "true";
     if (city) filter["pickupLocation.city"] = { $regex: city, $options: "i" };
-    
-    // Filter by requested by current user
-    if (requestedByMe === "true") {
-      filter.requestedBy = req.user.userId;
-    }
-    
-    // Filter by assigned to current user (driver)
-    if (assignedToMe === "true") {
-      filter.assignedDriverId = req.user.userId;
+
+    if (guest) {
+      filter.status = { $in: GUEST_VISIBLE_STATUSES };
+    } else {
+      if (requestedByMe === "true") {
+        filter.requestedBy = req.user?.userId;
+      }
+      if (assignedToMe === "true") {
+        filter.assignedDriverId = req.user?.userId;
+      }
     }
 
     // Search functionality
@@ -85,20 +97,24 @@ export const getAllDonations = async (
     sort[sortBy as string] = sortOrder === "asc" ? 1 : -1;
 
     // Execute query with population
-    const donations = await Donation.find(filter)
-      .populate("donorId", "firstName lastName email phone profileImage profileCompletionStatus donorRating donorRatingCount")
-      .populate("requestedBy", "firstName lastName email phone profileImage profileCompletionStatus")
-      .populate("assignedDriverId", "firstName lastName phone profileCompletionStatus driverInfo.rating driverInfo.ratingCount")
-      .populate("assignedPackerId", "firstName lastName phone profileCompletionStatus")
-      .sort(sort)
-      .skip(skip)
-      .limit(limitNum);
+    let query = Donation.find(filter).populate("donorId", guest ? guestListPopulate : "firstName lastName email phone profileImage profileCompletionStatus donorRating donorRatingCount");
 
+    if (!guest) {
+      query = query
+        .populate("requestedBy", "firstName lastName email phone profileImage profileCompletionStatus")
+        .populate("assignedDriverId", "firstName lastName phone profileCompletionStatus driverInfo.rating driverInfo.ratingCount")
+        .populate("assignedPackerId", "firstName lastName phone profileCompletionStatus");
+    }
+
+    const donations = await query.sort(sort).skip(skip).limit(limitNum);
     const total = await Donation.countDocuments(filter);
+    const payload = guest
+      ? donations.map((item) => sanitizeDonationForGuest(item.toJSON()))
+      : donations;
 
     res.status(200).json({
       success: true,
-      data: donations,
+      data: payload,
       pagination: {
         page: pageNum,
         limit: limitNum,
@@ -134,14 +150,40 @@ export const getDonationById = async (
       return next(new AppError("Donation not found", 404));
     }
 
+    if (
+      isGuestRequest(req) &&
+      !GUEST_VISIBLE_STATUSES.includes(donation.status as DonationStatus)
+    ) {
+      return next(new AppError("Donation not found", 404));
+    }
+
+    if (isGuestRequest(req)) {
+      const claimed = readGuestPreviewId(req);
+      const donationId = donation._id.toString();
+      if (!claimed) {
+        setGuestPreviewCookie(res, donationId);
+      } else if (claimed !== donationId) {
+        return next(
+          new AppError(
+            "Guest preview limit reached. Register to continue.",
+            403
+          )
+        );
+      }
+    }
+
     // Prevent caching to ensure fresh data
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     res.set('Pragma', 'no-cache');
     res.set('Expires', '0');
 
+    const data = isGuestRequest(req)
+      ? sanitizeDonationForGuest(donation.toJSON())
+      : donation;
+
     res.status(200).json({
       success: true,
-      data: donation,
+      data,
     });
   } catch (error) {
     next(error);

@@ -1,6 +1,7 @@
-import { Container, Typography, Button, Box, Pagination } from "@mui/material";
+import { Container, Typography, Button, Box, Pagination, Alert } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
+import { useAuthStore } from "../../shared/stores/authStore";
 import { useDonations } from "./hooks/useDonations";
 import { useDonationForm } from "./hooks/useDonationForm";
 import {
@@ -11,6 +12,7 @@ import {
 
 const DonationsPage = () => {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuthStore();
   const { donations, isLoading, filters, pagination, handleFilterChange, handlePageChange } = useDonations();
   const {
     open,
@@ -42,17 +44,24 @@ const DonationsPage = () => {
             {t("pages.donations.subtitle") || "Browse and create donations"}
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={handleOpen}
-          sx={{
-            background: "linear-gradient(135deg, #359364 0%, #24754f 100%)",
-          }}
-        >
-          {t("dashboard.createDonation") || "Create Donation"}
-        </Button>
+        {isAuthenticated && (
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={handleOpen}
+            sx={{
+              background: "linear-gradient(135deg, #359364 0%, #24754f 100%)",
+            }}
+          >
+            {t("dashboard.createDonation") || "Create Donation"}
+          </Button>
+        )}
       </Box>
+      {!isAuthenticated && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          {t("guest.banner")}
+        </Alert>
+      )}
 
       {/* Filters */}
       <DonationFilters filters={filters} onFilterChange={handleFilterChange} />

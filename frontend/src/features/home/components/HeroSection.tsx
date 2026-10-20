@@ -137,7 +137,11 @@ export const HeroSection = ({ isAuthenticated, t }: HeroSectionProps) => {
                 to="/donations"
                 variant="outlined"
                 size="large"
-                aria-label={t("home.hero.cta2")}
+                aria-label={
+                  isAuthenticated
+                    ? t("home.hero.cta2")
+                    : t("home.hero.ctaGuest")
+                }
                 sx={{
                   borderColor: "white",
                   color: "white",
@@ -150,7 +154,9 @@ export const HeroSection = ({ isAuthenticated, t }: HeroSectionProps) => {
                   },
                 }}
               >
-                {t("home.hero.cta2")}
+                {isAuthenticated
+                  ? t("home.hero.cta2")
+                  : t("home.hero.ctaGuest")}
               </Button>
             </Stack>
           </Grid>
