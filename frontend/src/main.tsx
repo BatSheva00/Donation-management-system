@@ -22,32 +22,27 @@ const queryClient = new QueryClient({
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <ErrorBoundary>
-    <I18nextProvider i18n={i18n}>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true,
-          }}
-        >
-          <ThemeWrapper>
+  <I18nextProvider i18n={i18n}>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ThemeWrapper>
+          <ErrorBoundary>
             <App />
-            <ToastContainer
-              autoClose={1000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick={false}
-              rtl={i18n.language === "he"}
-              pauseOnFocusLoss={false}
-              draggable={false}
-              pauseOnHover={true}
-              theme="colored"
-              limit={1}
-            />
-          </ThemeWrapper>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </I18nextProvider>
-  </ErrorBoundary>
+          </ErrorBoundary>
+          <ToastContainer
+            autoClose={1000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick={false}
+            rtl={i18n.language?.startsWith("he")}
+            pauseOnFocusLoss={false}
+            draggable={false}
+            pauseOnHover={true}
+            theme="colored"
+            limit={1}
+          />
+        </ThemeWrapper>
+      </BrowserRouter>
+    </QueryClientProvider>
+  </I18nextProvider>
 );

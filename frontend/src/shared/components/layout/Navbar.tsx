@@ -12,7 +12,6 @@ import {
   Box,
   Container,
   useScrollTrigger,
-  useMediaQuery,
   Slide,
   alpha,
 } from "@mui/material";
@@ -26,7 +25,6 @@ import {
   Person,
   Assignment,
   CardGiftcard,
-  Menu as MenuIcon,
 } from "@mui/icons-material";
 import { useAuthStore } from "../../stores/authStore";
 import { usePermission } from "../../hooks/usePermission";
@@ -43,8 +41,6 @@ const Navbar = () => {
   const { isAuthenticated, user, clearAuth, hasPermission } = useAuthStore();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [langAnchorEl, setLangAnchorEl] = useState<null | HTMLElement>(null);
-  const [mobileAnchor, setMobileAnchor] = useState<null | HTMLElement>(null);
-  const isDesktop = useMediaQuery("(min-width:900px)");
   
   // Initialize WebSocket for notifications
   useWebSocket();
@@ -89,19 +85,8 @@ const Navbar = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const mobileLinks = [
-    { to: "/donations", label: t("nav.donations") },
-    { to: "/requests", label: t("nav.requests") },
-    ...(isAuthenticated
-      ? [{ to: "/dashboard", label: t("nav.dashboard") }]
-      : [
-          { to: "/login", label: t("common.login") },
-          { to: "/register", label: t("common.register") },
-        ]),
-  ];
-
   return (
-    <Slide appear={false} direction="down" in={!trigger || !isDesktop}>
+    <Slide appear={false} direction="down" in={!trigger}>
       <AppBar
         position="sticky"
         elevation={0}
@@ -162,32 +147,6 @@ const Navbar = () => {
             </Box>
 
             <Box sx={{ flexGrow: 1 }} />
-
-            <IconButton
-              aria-label={t("nav.menu") || "Menu"}
-              onClick={(event) => setMobileAnchor(event.currentTarget)}
-              sx={{ display: { xs: "inline-flex", md: "none" }, mr: 0.5 }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              anchorEl={mobileAnchor}
-              open={Boolean(mobileAnchor)}
-              onClose={() => setMobileAnchor(null)}
-              disableScrollLock
-            >
-              {mobileLinks.map((item) => (
-                <MenuItem
-                  key={item.to}
-                  component={Link}
-                  to={item.to}
-                  selected={isActive(item.to)}
-                  onClick={() => setMobileAnchor(null)}
-                >
-                  {item.label}
-                </MenuItem>
-              ))}
-            </Menu>
 
             <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
               {isAuthenticated ? (
@@ -412,7 +371,6 @@ const Navbar = () => {
                     sx={{
                       color: "text.primary",
                       fontWeight: 500,
-                      display: { xs: "none", sm: "inline-flex" },
                       "&:hover": { bgcolor: alpha("#359364", 0.08) },
                     }}
                   >
@@ -423,7 +381,6 @@ const Navbar = () => {
                     component={Link}
                     to="/register"
                     sx={{
-                      display: { xs: "none", sm: "inline-flex" },
                       background:
                         "linear-gradient(135deg, #359364 0%, #24754f 100%)",
                       boxShadow: "0 4px 12px rgba(53, 147, 100, 0.3)",

@@ -19,10 +19,6 @@ export default defineConfig({
   preview: {
     port: 5173,
   },
-  build: {
-    target: ["es2018", "safari13"],
-    cssTarget: "safari13",
-  },
 });
 
 
