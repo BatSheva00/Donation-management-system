@@ -149,7 +149,6 @@ body {
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
 }
 
 /* Fix autocomplete background to cover full width including icon areas */
@@ -174,7 +173,7 @@ body {
 }
 
 #root {
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* RTL Support for Hebrew */
@@ -414,17 +413,19 @@ body {
   border-radius: 4px;
 }
 
-/* Prevent layout shift */
+/* Keep horizontal overflow clipped without the iOS position:relative scroll trap */
 html,
 body {
   overflow-x: hidden;
-  position: relative;
+  overflow-x: clip;
   max-width: 100%;
 }
 
 #root {
   overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100%;
+  min-height: 100dvh;
 }
 
 /* Prevent MUI scrollbar compensation from shifting the layout in LTR or RTL */

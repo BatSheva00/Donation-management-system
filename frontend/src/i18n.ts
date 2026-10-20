@@ -1,5 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import { readStoredItem, writeStoredItem } from "./shared/utils/safeStorage";
 
 const resources = {
   en: {
@@ -2176,7 +2177,7 @@ const resources = {
 
 i18n.use(initReactI18next).init({
   resources,
-  lng: localStorage.getItem("language") || "en",
+  lng: readStoredItem("language") || "en",
   fallbackLng: "en",
   interpolation: {
     escapeValue: false,
@@ -2188,7 +2189,7 @@ i18n.on("languageChanged", (lng) => {
   const hebrew = lng.toLowerCase().startsWith("he");
   document.documentElement.dir = hebrew ? "rtl" : "ltr";
   document.documentElement.lang = lng;
-  localStorage.setItem("language", lng);
+  writeStoredItem("language", lng);
 });
 
 const initialHebrew = i18n.language.toLowerCase().startsWith("he");

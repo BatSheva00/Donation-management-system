@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { disconnectWebSocket } from "../../hooks/useWebSocket";
+import { getSafeStorage } from "../utils/safeStorage";
 
 interface Role {
   key: string;
@@ -101,7 +102,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => getSafeStorage()),
       partialize: (state) => ({
         // Persist tokens, user data, and permissions
         accessToken: state.accessToken,

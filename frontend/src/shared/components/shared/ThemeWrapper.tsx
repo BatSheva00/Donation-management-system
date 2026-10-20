@@ -3,15 +3,20 @@ import { ThemeProvider, CssBaseline } from "@mui/material";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 import { prefixer } from "stylis";
-import rtlPlugin from "stylis-plugin-rtl";
+import rtlPluginImport from "stylis-plugin-rtl";
 import { useTranslation } from "react-i18next";
 import { createAppTheme } from "../../../theme";
+
+const rtlPlugin =
+  typeof rtlPluginImport === "function"
+    ? rtlPluginImport
+    : (rtlPluginImport as { default?: typeof rtlPluginImport }).default;
 
 const cacheLtr = createCache({ key: "muiltr", prepend: true });
 const cacheRtl = createCache({
   key: "muirtl",
   prepend: true,
-  stylisPlugins: [prefixer, rtlPlugin],
+  stylisPlugins: rtlPlugin ? [prefixer, rtlPlugin] : [prefixer],
 });
 
 interface ThemeWrapperProps {

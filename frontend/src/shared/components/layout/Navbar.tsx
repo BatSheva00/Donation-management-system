@@ -11,8 +11,12 @@ import {
   MenuItem,
   Box,
   Container,
-  Avatar,
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemText,
   useScrollTrigger,
+  useMediaQuery,
   Slide,
   alpha,
 } from "@mui/material";
@@ -26,6 +30,7 @@ import {
   Person,
   Assignment,
   CardGiftcard,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 import { useAuthStore } from "../../stores/authStore";
 import { usePermission } from "../../hooks/usePermission";
@@ -42,6 +47,8 @@ const Navbar = () => {
   const { isAuthenticated, user, clearAuth, hasPermission } = useAuthStore();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [langAnchorEl, setLangAnchorEl] = useState<null | HTMLElement>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width:900px)");
   
   // Initialize WebSocket for notifications
   useWebSocket();
@@ -86,14 +93,24 @@ const Navbar = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const mobileLinks = [
+    { to: "/donations", label: t("nav.donations") },
+    { to: "/requests", label: t("nav.requests") },
+    ...(isAuthenticated
+      ? [{ to: "/dashboard", label: t("nav.dashboard") }]
+      : [
+          { to: "/login", label: t("common.login") },
+          { to: "/register", label: t("common.register") },
+        ]),
+  ];
+
   return (
-    <Slide appear={false} direction="down" in={!trigger}>
+    <Slide appear={false} direction="down" in={!trigger || !isDesktop}>
       <AppBar
         position="sticky"
         elevation={0}
         sx={{
-          bgcolor: alpha("#ffffff", 0.95),
-          backdropFilter: "blur(20px)",
+          bgcolor: "#ffffff",
           borderBottom: "1px solid",
           borderColor: "divider",
         }}
@@ -149,6 +166,36 @@ const Navbar = () => {
             </Box>
 
             <Box sx={{ flexGrow: 1 }} />
+
+            <IconButton
+              aria-label={t("nav.menu") || "Menu"}
+              onClick={() => setMobileOpen(true)}
+              sx={{ display: { xs: "inline-flex", md: "none" }, mr: 0.5 }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Drawer
+              anchor={i18n.language.toLowerCase().startsWith("he") ? "right" : "left"}
+              open={mobileOpen}
+              onClose={() => setMobileOpen(false)}
+              disableScrollLock
+            >
+              <Box sx={{ width: 260, pt: 2 }} role="presentation">
+                <List>
+                  {mobileLinks.map((item) => (
+                    <ListItemButton
+                      key={item.to}
+                      component={Link}
+                      to={item.to}
+                      selected={isActive(item.to)}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <ListItemText primary={item.label} />
+                    </ListItemButton>
+                  ))}
+                </List>
+              </Box>
+            </Drawer>
 
             <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
               {isAuthenticated ? (
@@ -373,6 +420,7 @@ const Navbar = () => {
                     sx={{
                       color: "text.primary",
                       fontWeight: 500,
+                      display: { xs: "none", sm: "inline-flex" },
                       "&:hover": { bgcolor: alpha("#359364", 0.08) },
                     }}
                   >
@@ -383,6 +431,7 @@ const Navbar = () => {
                     component={Link}
                     to="/register"
                     sx={{
+                      display: { xs: "none", sm: "inline-flex" },
                       background:
                         "linear-gradient(135deg, #359364 0%, #24754f 100%)",
                       boxShadow: "0 4px 12px rgba(53, 147, 100, 0.3)",
