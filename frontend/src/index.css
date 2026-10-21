@@ -446,15 +446,19 @@ body {
   border-radius: 4px;
 }
 
-/* Prevent layout shift */
+/* Keep the page on-screen on iOS. position:relative on html/body clips RTL into a blank view. */
 html,
-body {
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
-  position: relative;
 }
 
-#root {
-  overflow-x: hidden;
+[dir="rtl"] .MuiGrid-container {
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 /* Prevent MUI from adding padding when menus open */

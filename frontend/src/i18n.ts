@@ -2174,9 +2174,25 @@ const resources = {
   },
 };
 
+function readLanguage(): string {
+  try {
+    return localStorage.getItem("language") || "en";
+  } catch {
+    return "en";
+  }
+}
+
+function writeLanguage(lng: string): void {
+  try {
+    localStorage.setItem("language", lng);
+  } catch {
+    // Some mobile browsers block storage; the UI language still works in-memory.
+  }
+}
+
 i18n.use(initReactI18next).init({
   resources,
-  lng: localStorage.getItem("language") || "en",
+  lng: readLanguage(),
   fallbackLng: "en",
   interpolation: {
     escapeValue: false,
@@ -2187,7 +2203,7 @@ i18n.use(initReactI18next).init({
 i18n.on("languageChanged", (lng) => {
   document.documentElement.dir = lng === "he" ? "rtl" : "ltr";
   document.documentElement.lang = lng;
-  localStorage.setItem("language", lng);
+  writeLanguage(lng);
 });
 
 // Set initial direction
