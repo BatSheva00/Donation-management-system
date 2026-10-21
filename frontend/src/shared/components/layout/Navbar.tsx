@@ -11,8 +11,6 @@ import {
   MenuItem,
   Box,
   Container,
-  useScrollTrigger,
-  Slide,
   alpha,
 } from "@mui/material";
 import {
@@ -45,8 +43,6 @@ const Navbar = () => {
   
   // Initialize WebSocket for notifications
   useWebSocket();
-
-  const trigger = useScrollTrigger();
 
   // Calculate permissions - will re-render when permissions change
   const isAdmin = hasPermission("system.admin", "users.manage");
@@ -88,7 +84,6 @@ const Navbar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <Slide appear={false} direction="down" in={!trigger}>
       <AppBar
         position="sticky"
         elevation={0}
@@ -450,7 +445,6 @@ const Navbar = () => {
           </Toolbar>
         </Container>
       </AppBar>
-    </Slide>
   );
 };
 
