@@ -13,9 +13,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="kl-boot" style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;color:#359364;padding:24px;text-align:center">
+        KindLoop
+      </div>
+    </div>
     <noscript>KindLoop needs JavaScript enabled to run.</noscript>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      setTimeout(function () {
+        var boot = document.getElementById("kl-boot");
+        if (!boot) return;
+        boot.innerHTML =
+          "<p dir=\"rtl\">העמוד לא נטען. סגרי את הטאב, מחקי נתוני גלישה לאתר kindloop-one.vercel.app, ופתחי שוב.</p>" +
+          "<p><a href=\"https://kindloop-one.vercel.app/\" style=\"color:#359364\">Open KindLoop</a></p>";
+      }, 8000);
+    </script>
   </body>
 </html>
 
